@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { logout, getCurrentUser } from "@/utils/api";
+import { ModeToggle } from "./theme/ModeToggle";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -146,8 +147,13 @@ const SchoolNavbar = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         <div className="flex gap-4">
-          <Link to="/" className="text-2xl font-bold">
-            School Sync
+          <Link to="/" className="flex items-center gap-4">
+            <span className="rounded-full bg-primary p-2 text-secondary">
+              <GraduationCap />
+            </span>
+            <div className="text-2xl font-bold ">
+              School <span className="text-primary">Sync</span>
+            </div>
           </Link>
           <nav className="hidden md:flex items-center space-x-4">
             <NavigationMenu>
@@ -205,6 +211,7 @@ const SchoolNavbar = () => {
         </div>
 
         <div className="hidden md:flex items-center space-x-4">
+          <ModeToggle />
           {localStorage.getItem("token") ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -231,7 +238,7 @@ const SchoolNavbar = () => {
                       {user?.name}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {user?.role || "User"}
+                      {user?.email || "User"}
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -260,7 +267,7 @@ const SchoolNavbar = () => {
               <Button variant="ghost" asChild>
                 <Link to="/sign-in">Sign in</Link>
               </Button>
-              <Button variant="outline" asChild>
+              <Button asChild>
                 <Link to="/sign-up">Sign up</Link>
               </Button>
             </>
@@ -338,11 +345,9 @@ const SchoolNavbar = () => {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-medium">
-                      {user?.name || "User"}
-                    </p>
+                    <p className="text-sm font-medium">{user?.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {user?.role || "No role"}
+                      {user?.email}
                     </p>
                   </div>
                 </div>
@@ -368,7 +373,7 @@ const SchoolNavbar = () => {
                   <Button variant="outline" className="w-full mb-2" asChild>
                     <Link to="/sign-in">Sign in</Link>
                   </Button>
-                  <Button variant="default" className="w-full" asChild>
+                  <Button className="w-full" asChild>
                     <Link to="/sign-up">Sign up</Link>
                   </Button>
                 </>

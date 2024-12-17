@@ -8,6 +8,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  GraduationCap,
 } from "lucide-react";
 
 const primaryLinks = [
@@ -28,8 +29,11 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="flex flex-col items-start space-y-4">
-            <Link to="/" className="text-2xl font-bold">
-              School Sync
+            <Link to="/" className="text-2xl font-bold flex items-center gap-2">
+              <span className="rounded-full bg-primary p-1 text-secondary">
+                <GraduationCap />
+              </span>
+              School <span className="text-primary">Sync</span>
             </Link>
             <div className="space-y-2 text-sm text-muted-foreground">
               <div className="flex items-center space-x-2">
