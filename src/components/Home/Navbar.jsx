@@ -85,7 +85,7 @@ const menuItems = [
     ],
   },
   { title: "Dashboard", href: "/dashboard" },
-  { title: "Announcements", href: "/announcements" },
+  { title: "How It Works", href: "/how-it-works" },
 ];
 
 const Navbar = () => {
@@ -145,7 +145,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full h-14 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
       <div className="max-w-7xl mx-auto h-14 px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         <div className="flex gap-4">
           <Logo />

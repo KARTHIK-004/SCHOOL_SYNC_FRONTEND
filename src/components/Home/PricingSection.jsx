@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SmallTitle from "@/components/ui/small-title";
+import SectionHeader from "../ui/section-header";
 
 const features = [
   { title: "Complete Student Management System", included: true },
@@ -24,22 +25,15 @@ export default function PricingSection() {
   return (
     <section className="py-12 sm:py-20">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="flex justify-center mb-4">
-            <SmallTitle logo="🎯" title="Choose Your Plan" />
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-            Transparent, Per-Student Pricing
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Simple, predictable pricing that grows with your institution. All
-            features included, no hidden fees.
-          </p>
-          <p className="text-lg text-muted-foreground mt-2">
-            Special discounts available for large institutions.
-          </p>
+        <div className="mx-auto max-w-3xl text-center">
+          <SectionHeader
+            logo="🎯"
+            title="Choose Your Plan"
+            heading="Transparent, Per-Student Pricing"
+            description="  Simple, predictable pricing that grows with your institution. All
+            features included, no hidden fees. Special discounts available for large institutions."
+          />
         </div>
-
         <div className="mt-8 flex justify-center">
           <Tabs
             defaultValue="monthly"

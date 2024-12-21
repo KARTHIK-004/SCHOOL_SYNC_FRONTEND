@@ -2,6 +2,8 @@ import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
+import BookDemo from "./pages/BookDemo";
+import HowItWorks from "./pages/HowItWorks";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Layout from "./pages/dashboard/Layout";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -13,7 +15,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-
+          <Route path="/contact-us" element={<BookDemo />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/dashboard" element={<Layout />}>

@@ -3,7 +3,7 @@ import Select from "react-tailwindcss-select";
 import AddNewButton from "@/components/FormInputs/AddNewButton";
 import { Label } from "../ui/label";
 
-const FormSelectInput = ({
+const FormSelectInput1 = ({
   options,
   label,
   option,
@@ -63,10 +63,10 @@ const FormSelectInput = ({
         )}
       </div>
       {errors[name] && (
-        <p className="mt-2 text-sm text-destructive">{errors[name]?.message}</p>
+        <p className="mt-2 text-sm text-red-600">{errors[name]?.message}</p>
       )}
     </div>
   );
 };
 
-export default FormSelectInput;
+export default FormSelectInput1;

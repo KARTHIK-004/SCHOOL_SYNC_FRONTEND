@@ -136,7 +136,7 @@ const navLinks = [
     items: [
       {
         title: "Overview",
-        url: "/dashboard/overview",
+        url: "/dashboard",
       },
     ],
   },

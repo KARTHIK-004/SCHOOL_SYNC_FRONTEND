@@ -1,8 +1,4 @@
-"use client";
-
 import * as React from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
@@ -23,7 +19,7 @@ import {
   PiggyBank,
   TrendingDown,
 } from "lucide-react";
-import SmallTitle from "../ui/small-title";
+import SectionHeader from "@/components/ui/section-header";
 
 const tabs = [
   { value: "students", label: "Students", icon: Users },
@@ -144,15 +140,14 @@ export default function FeaturesSection() {
     <section className="py-12 sm:py-20 bg-background">
       <div className=" mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <SmallTitle logo="⚡" title="Enterprise-Grade Solutions" />
-          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl mb-4">
-            Integrated Educational Management
-          </h2>
-          <p className="mt-4 text-lg leading-8 text-muted-foreground">
-            Elevate your institution's operational efficiency with our
+          <SectionHeader
+            logo="⚡"
+            title="Enterprise-Grade Solutions"
+            heading="Integrated Educational Management"
+            description="Elevate your institution's operational efficiency with our
             comprehensive suite of management tools, designed for the modern
-            educational landscape.
-          </p>
+            educational landscape."
+          />
         </div>
 
         <div className="mt-16">

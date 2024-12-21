@@ -6,6 +6,7 @@ import Navbar from "@/components/Home/Navbar";
 import PricingSection from "@/components/Home/PricingSection";
 
 import React from "react";
+import ContactUs from "@/components/Home/ContactUs";
 
 function Home() {
   return (
@@ -15,6 +16,7 @@ function Home() {
       <CloudLogo />
       <FeatureSection />
       <PricingSection />
+      <ContactUs />
       <Footer />
     </>
   );
