@@ -108,7 +108,7 @@ export default function PhoneInput({
       </div>
       <div className="mt-2">
         <div className="flex gap-2">
-          <div className="w-32">
+          <div className="w-28">
             <Select
               isSearchable
               primaryColor="primary"

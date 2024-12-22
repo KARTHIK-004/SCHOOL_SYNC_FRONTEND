@@ -1,5 +1,4 @@
 import { ModeToggle } from "@/components/theme/ModeToggle";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -10,7 +9,7 @@ import UserInfo from "./sidebar-user-info";
 function SidebarHeader() {
   const [searchQuery, setSearchQuery] = useState("");
   return (
-    <div className="flex h-16 items-center gap-4 border-b px-4">
+    <div className="sticky top-0 right-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 shadow-sm">
       <SidebarTrigger />
       <div className="flex-1">
         <Input

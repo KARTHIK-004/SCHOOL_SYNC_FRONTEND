@@ -1,11 +1,17 @@
 import React from "react";
+import SectionHeader from "../ui/section-header";
 
 function CloudLogo() {
   return (
     <div className="bg-background py-12 sm:py-20">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <h2 className="text-center text-lg font-semibold text-foreground">
-          Trusted by Leading Educational Institutions Worldwide
+        <h2 className="text-center text-lg font-semibold">
+          <SectionHeader
+            logo="☁️"
+            title="Trusted by Institutions"
+            heading="Educational Institutions Worldwide"
+            description="Leading schools and universities rely on our cloud-based system for seamless and efficient management solutions."
+          />
         </h2>
         <div className="mx-auto mt-10 grid max-w-lg grid-cols-4 items-center gap-x-8 gap-y-10 sm:max-w-xl sm:grid-cols-6 sm:gap-x-10 lg:mx-0 lg:max-w-none lg:grid-cols-5 text-primary">
           <img

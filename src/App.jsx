@@ -5,8 +5,10 @@ import SignUp from "./pages/auth/SignUp";
 import BookDemo from "./pages/BookDemo";
 import HowItWorks from "./pages/HowItWorks";
 import Dashboard from "./pages/dashboard/Dashboard";
+import Students from "./pages/dashboard/students/Students";
 import Layout from "./pages/dashboard/Layout";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import CreateStudents from "./pages/dashboard/students/CreateStudents";
 
 export default function App() {
   return (
@@ -21,6 +23,8 @@ export default function App() {
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
+            <Route path="students" element={<Students />} />
+            <Route path="students/new" element={<CreateStudents />} />
           </Route>
         </Routes>
       </BrowserRouter>

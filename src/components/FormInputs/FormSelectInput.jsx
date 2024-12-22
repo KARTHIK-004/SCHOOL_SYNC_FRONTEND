@@ -14,6 +14,7 @@ const FormSelectInput = ({
   name,
   register,
   errors,
+  isSearchable = true,
 }) => {
   const handleChange = useCallback(
     (selectedOption) => {
@@ -37,7 +38,7 @@ const FormSelectInput = ({
 
       <div className="flex items-center space-x-2">
         <Select
-          isSearchable
+          isSearchable={isSearchable}
           primaryColor="blue"
           value={option}
           onChange={handleChange}

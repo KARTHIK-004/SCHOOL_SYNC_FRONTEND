@@ -17,7 +17,6 @@ import TextArea from "@/components/FormInputs/TextAreaInput";
 import PhoneInput from "@/components/FormInputs/PhoneInput";
 import FormSelectInput from "@/components/FormInputs/FormSelectInput";
 import { countries } from "@/lib/countryData";
-import FormSelectInput1 from "@/components/FormInputs/FormSelectInput copy";
 
 const ContactUs = () => {
   const {
@@ -170,8 +169,6 @@ const ContactUs = () => {
                     type="email"
                     errors={errors}
                     placeholder="Eg. johndoe@gmail.com"
-                    phoneCode={phoneCode}
-                    setPhoneCode={setPhoneCode}
                   />
                   <PhoneInput
                     register={register}
@@ -179,6 +176,8 @@ const ContactUs = () => {
                     name="phone"
                     label="Phone Number"
                     toolTipText="Please enter your contact number"
+                    phoneCode={phoneCode}
+                    setPhoneCode={setPhoneCode}
                   />
                 </div>
                 <div className="grid md:grid-cols-2 gap-4 mb-4">

@@ -4,7 +4,7 @@ import SmallTitle from "@/components/ui/small-title";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary text-foreground">
+    <div className="min-h-screen ">
       <main className="mx-auto px-4 pt-14 text-center">
         {/* Welcome Banner */}
         <SmallTitle logo="✨" title="Welcome to School Sync" />

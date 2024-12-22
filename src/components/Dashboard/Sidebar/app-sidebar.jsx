@@ -147,19 +147,19 @@ const navLinks = [
     items: [
       {
         title: "Student Directory",
-        url: "/students/directory",
+        url: "/dashboard/students",
       },
       {
         title: "Enrollment",
-        url: "/students/enrollment",
+        url: "/dashboard/students/enrollment",
       },
       {
         title: "Attendance",
-        url: "/students/attendance",
+        url: "/dashboard/students/attendance",
       },
       {
         title: "Performance",
-        url: "/students/performance",
+        url: "/dashboard/students/performance",
       },
     ],
   },
