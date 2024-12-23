@@ -108,6 +108,21 @@ export default function SingleStudent({ editingId, initialData }) {
     },
   ];
 
+  const religions = [
+    {
+      label: "Hindu",
+      value: "Hindu",
+    },
+    {
+      label: "Muslim",
+      value: "Muslim",
+    },
+    {
+      label: "Christian",
+      value: "Christian",
+    },
+  ];
+
   const initialCountryCode = "IN";
   const initialCountry = countries.find(
     (item) => item.countryCode === initialCountryCode
@@ -116,12 +131,13 @@ export default function SingleStudent({ editingId, initialData }) {
     useState(initialCountry);
   const [selectedParent, setSelectedParent] = useState(null);
   const [selectedGender, setSelectedGender] = useState(null);
+  const [selectedReligion, setSelectedReligion] = useState(null);
   const [selectedBloodGroup, setSelectedBloodGroup] = useState(null);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedStream, setSelectedStream] = useState(null);
   const [phoneCode, setPhoneCode] = useState(false);
   const [loading, setLoading] = useState(false);
-  const initialImage = initialData?.imageUrl || "/placeholder.svg";
+  const initialImage = initialData?.imageUrl || "/student.png";
   const [imageUrl, setImageUrl] = useState(initialImage);
 
   async function saveStudent(data) {
@@ -266,7 +282,6 @@ export default function SingleStudent({ editingId, initialData }) {
                 onChange={setSelectedClass}
                 toolTipText="Add New Class"
                 href="/dashboard/academics/class/new"
-                required
               />
               <FormSelectInput
                 label="Stream"
@@ -280,18 +295,46 @@ export default function SingleStudent({ editingId, initialData }) {
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
-              <TextArea
-                register={register}
-                errors={errors}
-                label="Description"
-                name="description"
-              />
+              <div className="">
+                <TextInput
+                  register={register}
+                  errors={errors}
+                  label="Admission Date"
+                  name="admissiondate"
+                />
+                <TextInput
+                  register={register}
+                  errors={errors}
+                  label="Birth Certificate No"
+                  name="birthcertificateno"
+                />
+                <TextInput
+                  register={register}
+                  errors={errors}
+                  label="Register No"
+                  name="regno"
+                />
+                <TextInput
+                  register={register}
+                  errors={errors}
+                  label="State/Village"
+                  name="state"
+                />
+                <TextArea
+                  register={register}
+                  errors={errors}
+                  label="Address"
+                  name="address"
+                />
+              </div>
+
               <div>
                 <ImageInput
-                  title="Student Photo"
+                  title="Student Profile Photo"
                   imageUrl={imageUrl}
                   setImageUrl={setImageUrl}
-                  endpoint="studentImage"
+                  endpoint="studentProfileImage"
+                  className="object-contain"
                 />
               </div>
             </div>
@@ -299,10 +342,10 @@ export default function SingleStudent({ editingId, initialData }) {
         </div>
       </div>
       <FormFooter
-        href="/categories"
+        href="/student"
         editingId={editingId}
         loading={loading}
-        title="Category"
+        title="Student"
         parent=""
       />
     </form>
