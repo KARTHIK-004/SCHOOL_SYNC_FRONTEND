@@ -31,9 +31,9 @@ const TextInput = ({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button type="button">
+                <Button type="button">
                   <CircleHelp className="w-4 h-4 text-muted-foreground" />
-                </button>
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>{toolTipText}</p>

@@ -9,6 +9,10 @@ import Students from "./pages/dashboard/students/Students";
 import Layout from "./pages/dashboard/Layout";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import CreateStudents from "./pages/dashboard/students/CreateStudents";
+import Parents from "./pages/dashboard/users/Parents";
+import CreateParents from "./pages/dashboard/users/CreateParents";
+import ClassManagement from "./pages/dashboard/academics/Classes";
+import SchoolOnboard from "./pages/SchoolOnboard";
 
 export default function App() {
   return (
@@ -17,7 +21,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/contact-us" element={<BookDemo />} />
+          <Route path="/book-demo" element={<BookDemo />} />
+          <Route path="/school-onboard" element={<SchoolOnboard />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/sign-in" element={<SignIn />} />
@@ -25,6 +30,9 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="students" element={<Students />} />
             <Route path="students/new" element={<CreateStudents />} />
+            <Route path="users/parents" element={<Parents />} />
+            <Route path="users/parents/new" element={<CreateParents />} />
+            <Route path="academics/classes" element={<ClassManagement />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -3,6 +3,9 @@ import axios from "axios";
 const api = axios.create({
   baseURL: "/api",
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.request.use((config) => {
@@ -68,5 +71,53 @@ export const getCurrentUser = async () => {
       }
     }
     throw error;
+  }
+};
+
+// export const createSchool = async (formData) => {
+//   try {
+//     const response = await api.post(`/schools/create`, formData);
+//     return response.data;
+//   } catch (error) {
+//     throw error.response ? error.response.data : error.message;
+//   }
+// };
+
+export const createSchool = async (formData) => {
+  const response = await fetch("/api/schools/create", {
+    method: "POST",
+    body: formData,
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to create school");
+  }
+  return response.json();
+};
+
+export const getSchools = async () => {
+  try {
+    const response = await api.get(`/schools/list`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const submitContactForm = async (formData) => {
+  try {
+    const response = await api.post(`/contact/submit`, formData);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getContactSubmissions = async () => {
+  try {
+    const response = await api.get(`/contact/submissions`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
   }
 };

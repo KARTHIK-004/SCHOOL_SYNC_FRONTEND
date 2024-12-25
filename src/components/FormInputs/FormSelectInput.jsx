@@ -15,6 +15,7 @@ const FormSelectInput = ({
   register,
   errors,
   isSearchable = true,
+  required = true,
 }) => {
   const handleChange = useCallback(
     (selectedOption) => {
@@ -30,10 +31,14 @@ const FormSelectInput = ({
     [setOption, register, name]
   );
 
+  register(name, {
+    required: required ? `${label} is required` : false,
+  });
+
   return (
     <div className="space-y-2">
       <div className="flex space-x-2 items-center">
-        {labelShown && <Label className=" text-sm font-medium">{label}</Label>}
+        {labelShown && <Label className="text-sm font-medium">{label}</Label>}
       </div>
 
       <div className="flex items-center space-x-2">
@@ -47,7 +52,9 @@ const FormSelectInput = ({
           name={name}
           classNames={{
             menuButton: ({ isDisabled }) =>
-              `flex text-sm text-foreground border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 w-full items-center justify-between rounded-md px-3 py-2 ${
+              `flex text-sm text-foreground border ${
+                errors[name] ? "border-destructive" : "border-input"
+              } bg-background hover:bg-accent hover:text-accent-foreground h-10 w-full items-center justify-between rounded-md px-3 py-2 ${
                 isDisabled && "opacity-50"
               }`,
             menu: "absolute z-10 w-full bg-popover text-popover-foreground shadow-md rounded-md py-1 mt-1",

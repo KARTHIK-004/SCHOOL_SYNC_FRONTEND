@@ -27,6 +27,7 @@ import {
   Settings,
   Settings2,
   SquareTerminal,
+  User,
   Users,
 } from "lucide-react";
 import React from "react";
@@ -38,96 +39,6 @@ import {
 import UserInfo from "./sidebar-user-info";
 import Logo from "@/components/ui/logo";
 
-const data = {
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-};
-
 const navLinks = [
   {
     title: "Dashboard",
@@ -137,6 +48,21 @@ const navLinks = [
       {
         title: "Overview",
         url: "/dashboard",
+      },
+    ],
+  },
+  {
+    title: "User",
+    url: "/dashboard/users",
+    icon: User,
+    items: [
+      {
+        title: "Parents",
+        url: "/dashboard/users/parents",
+      },
+      {
+        title: "Secretary",
+        url: "/dashboard/users/secretary",
       },
     ],
   },
@@ -165,28 +91,28 @@ const navLinks = [
   },
   {
     title: "Academics",
-    url: "/academics",
+    url: "/dashboard/academics",
     icon: BookOpen,
     items: [
       {
-        title: "Curriculum",
-        url: "/academics/curriculum",
+        title: "Classes",
+        url: "/dashboard/academics/classes",
       },
       {
-        title: "Timetable",
-        url: "/academics/timetable",
+        title: "Streams",
+        url: "/dashboard/academics/streams",
       },
       {
         title: "Examinations",
-        url: "/academics/examinations",
+        url: "/dashboard/academics/examinations",
       },
       {
         title: "Assignments",
-        url: "/academics/assignments",
+        url: "/dashboard/academics/assignments",
       },
       {
         title: "Report Cards",
-        url: "/academics/report-cards",
+        url: "/dashboard/academics/report-cards",
       },
     ],
   },

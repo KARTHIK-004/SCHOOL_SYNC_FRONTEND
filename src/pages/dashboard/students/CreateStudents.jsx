@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/tooltip";
 import SingleStudent from "@/components/Dashboard/Forms/Students/single-student-form";
 import BulkStudent from "@/components/Dashboard/Forms/Students/bulk-student-form";
+import InfoBanner from "@/components/ui/info-banner";
 
 export default function CreateStudents() {
   return (
@@ -46,13 +47,10 @@ export default function CreateStudents() {
         </Button>
       </div>
 
-      <Alert className="mb-8">
-        <AlertTitle>Tip</AlertTitle>
-        <AlertDescription>
-          For large numbers of students, consider using the Bulk Admission
-          feature to save time.
-        </AlertDescription>
-      </Alert>
+      <InfoBanner
+        message="Please create the Parent, Class, and Stream first."
+        type="warning"
+      />
 
       <div className="container mx-auto max-w-6xl">
         <Tabs defaultValue="single" className="w-full">

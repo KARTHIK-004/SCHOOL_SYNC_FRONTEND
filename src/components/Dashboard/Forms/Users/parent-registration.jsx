@@ -12,15 +12,14 @@ import PhoneInput from "@/components/FormInputs/PhoneInput";
 import { Lock } from "lucide-react";
 import { countries } from "@/lib/countryData";
 import {
-  parents,
   genders,
-  bloodGroups,
-  religions,
-  classes,
-  streams,
+  occupations,
+  relationships,
+  titles,
+  contactMethods,
 } from "@/lib/formOption";
 
-export default function SingleStudent({ editingId, initialData }) {
+export default function ParentRegistration({ editingId, initialData }) {
   const {
     register,
     handleSubmit,
@@ -28,16 +27,16 @@ export default function SingleStudent({ editingId, initialData }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
+      title: initialData?.title || "",
       firstname: initialData?.firstname || "",
       lastname: initialData?.lastname || "",
       email: initialData?.email || "",
       phone: initialData?.phone || "",
+      whatsapp: initialData?.whatsapp || "",
       address: initialData?.address || "",
       state: initialData?.state || "",
-      dob: initialData?.dob || "",
-      admissiondate: initialData?.admissiondate || "",
-      birthcertificateno: initialData?.birthcertificateno || "",
-      regno: initialData?.regno || "",
+      occupation: initialData?.occupation || "",
+      nationalId: initialData?.nationalId || "",
     },
   });
 
@@ -50,48 +49,49 @@ export default function SingleStudent({ editingId, initialData }) {
     (item) => item.countryCode === initialCountryCode
   );
 
+  const [selectedTitle, setSelectedTitle] = useState(null);
   const [selectedNationality, setSelectedNationality] = useState(
     initialData?.nationality
       ? countries.find((c) => c.value === initialData.nationality)
       : initialCountry
   );
-
-  const [selectedParent, setSelectedParent] = useState(null);
   const [selectedGender, setSelectedGender] = useState(null);
-  const [selectedReligion, setSelectedReligion] = useState(null);
-  const [selectedBloodGroup, setSelectedBloodGroup] = useState(null);
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [selectedStream, setSelectedStream] = useState(null);
+  const [selectedRelationship, setSelectedRelationship] = useState(null);
+  const [selectedOccupation, setSelectedOccupation] = useState(null);
+  const [selectedPreferredContact, setSelectedPreferredContact] =
+    useState(null);
   const [phoneCode, setPhoneCode] = useState(false);
+  const [whatsappCode, setWhatsappCode] = useState(false);
   const [imageUrl, setImageUrl] = useState("/student.png");
 
-  async function saveStudent(data) {
+  async function saveParent(data) {
     try {
       setLoading(true);
       const formData = {
         ...data,
         imageUrl,
+        title: selectedTitle?.value,
         nationality: selectedNationality?.value,
         gender: selectedGender?.value,
-        religion: selectedReligion?.value,
-        bloodGroup: selectedBloodGroup?.value,
-        class: selectedClass?.value,
-        stream: selectedStream?.value,
+        relationship: selectedRelationship?.value,
+        occupation: selectedOccupation?.value,
+        preferredContact: selectedPreferredContact?.value,
         phoneCode,
+        whatsappCode,
       };
 
       if (editingId) {
-        // await updateStudent(editingId, formData);
+        // await updateParent(editingId, formData);
         // toast.success("Updated Successfully!");
       } else {
-        // await createStudent(formData);
+        // await createParent(formData);
         // toast.success("Successfully Created!");
       }
 
       reset();
-      setImageUrl("/student.png");
+      setImageUrl("/parent.png");
       console.log(data);
-      // navigate("/students");
+      // navigate("/parents");
     } catch (error) {
       console.error(error);
     } finally {
@@ -100,11 +100,11 @@ export default function SingleStudent({ editingId, initialData }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(saveStudent)}>
+    <form onSubmit={handleSubmit(saveParent)}>
       <FormHeader
-        href="/students"
+        href="/users/parents"
         parent=""
-        title="Students"
+        title="Parents"
         editingId={editingId}
         loading={loading}
       />
@@ -112,32 +112,34 @@ export default function SingleStudent({ editingId, initialData }) {
       <div className="grid grid-cols-12 gap-6 py-8">
         <div className="lg:col-span-12 col-span-full space-y-3">
           <div className="grid gap-6">
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-3 gap-4">
+              <FormSelectInput
+                label="Title"
+                name="title"
+                register={register}
+                errors={errors}
+                options={titles}
+                option={selectedTitle}
+                setOption={setSelectedTitle}
+                required
+              />
               <TextInput
                 register={register}
                 errors={errors}
                 label="First Name"
-                name="name"
+                name="firstname"
                 required
               />
               <TextInput
                 register={register}
                 errors={errors}
-                label="Middle Name"
-                name="middlename"
+                label="Last Name"
+                name="lastname"
                 required
               />
             </div>
 
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <TextInput
-                register={register}
-                errors={errors}
-                label="Date of Birth"
-                name="dob"
-                type="date"
-                required
-              />
+            <div className="grid sm:grid-cols-3 gap-4">
               <FormSelectInput
                 label="Gender"
                 name="gender"
@@ -150,13 +152,23 @@ export default function SingleStudent({ editingId, initialData }) {
                 required
               />
               <FormSelectInput
-                label="Blood Group"
-                name="bloodGroup"
+                label="Relationship"
+                name="relationship"
                 register={register}
                 errors={errors}
-                options={bloodGroups}
-                option={selectedBloodGroup}
-                setOption={setSelectedBloodGroup}
+                options={relationships}
+                option={selectedRelationship}
+                setOption={setSelectedRelationship}
+                required
+              />
+              <FormSelectInput
+                label="Occupation"
+                name="occupation"
+                register={register}
+                errors={errors}
+                options={occupations}
+                option={selectedOccupation}
+                setOption={setSelectedOccupation}
                 required
               />
             </div>
@@ -177,11 +189,11 @@ export default function SingleStudent({ editingId, initialData }) {
                 name="password"
                 errors={errors}
                 required={!editingId}
-                toolTipText="Enter a password to log in to the Student Portal."
+                toolTipText="Enter a password to log in to the Parent Portal."
               />
             </div>
 
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4">
               <PhoneInput
                 register={register}
                 errors={errors}
@@ -192,93 +204,49 @@ export default function SingleStudent({ editingId, initialData }) {
                 setPhoneCode={setPhoneCode}
                 required
               />
-              <FormSelectInput
-                label="Parent Name "
-                name="parent"
+              <PhoneInput
                 register={register}
                 errors={errors}
-                options={parents}
-                option={selectedParent}
-                setOption={setSelectedParent}
-                toolTipText="Add New Parent/Guardian"
-                href="/dashboard/users/parents/new"
-                required
-              />
-              <FormSelectInput
-                label="Religion"
-                name="religion"
-                register={register}
-                errors={errors}
-                options={religions}
-                option={selectedReligion}
-                setOption={setSelectedReligion}
-                required
+                name="whatsapp"
+                label="WhatsApp Number"
+                toolTipText="Please enter your WhatsApp number"
+                phoneCode={whatsappCode}
+                setPhoneCode={setWhatsappCode}
               />
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-3 gap-4">
               <FormSelectInput
-                label="Class"
-                name="class"
+                label="Nationality"
+                name="nationality"
                 register={register}
                 errors={errors}
-                options={classes}
-                option={selectedClass}
-                setOption={setSelectedClass}
-                toolTipText="Add New Class"
-                href="/dashboard/academics/classes/new"
+                options={countries}
+                option={selectedNationality}
+                setOption={setSelectedNationality}
+                required
+              />
+              <TextInput
+                register={register}
+                errors={errors}
+                label="National ID / Passport"
+                name="nationalId"
                 required
               />
               <FormSelectInput
-                label="Stream"
-                name="stream"
+                label="Preferred Contact Method"
+                name="preferredContact"
                 register={register}
                 errors={errors}
-                options={streams}
-                option={selectedStream}
-                setOption={setSelectedStream}
-                toolTipText="Add New Stream"
-                href="/dashboard/academics/streams/new"
-                required
-              />
-            </div>
-
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <TextInput
-                register={register}
-                errors={errors}
-                label="Admission Date"
-                name="admissiondate"
-                required
-              />
-              <TextInput
-                register={register}
-                errors={errors}
-                label="Birth Certificate No"
-                name="birthcertificateno"
-                required
-              />
-              <TextInput
-                register={register}
-                errors={errors}
-                label="Register No"
-                name="regno"
+                options={contactMethods}
+                option={selectedPreferredContact}
+                setOption={setSelectedPreferredContact}
                 required
               />
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-4">
-                <FormSelectInput
-                  label="Nationality"
-                  name="nationality"
-                  register={register}
-                  errors={errors}
-                  options={countries}
-                  option={selectedNationality}
-                  setOption={setSelectedNationality}
-                  required
-                />
                 <TextInput
                   register={register}
                   errors={errors}
@@ -297,10 +265,10 @@ export default function SingleStudent({ editingId, initialData }) {
 
               <div>
                 <ImageInput
-                  title="Student Profile Photo"
+                  title="Parent Profile Photo"
                   imageUrl={imageUrl}
                   setImageUrl={setImageUrl}
-                  endpoint="studentProfileImage"
+                  endpoint="parentProfileImage"
                   className="object-contain"
                 />
               </div>
@@ -310,10 +278,10 @@ export default function SingleStudent({ editingId, initialData }) {
       </div>
 
       <FormFooter
-        href="/students"
+        href="/parents"
         editingId={editingId}
         loading={loading}
-        title="Student"
+        title="Parent"
         parent=""
       />
     </form>

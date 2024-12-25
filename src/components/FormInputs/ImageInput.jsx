@@ -9,17 +9,23 @@ export default function ImageInput({
   setImageUrl,
   endpoint,
   className,
+  size = "lg",
 }) {
   return (
     <Card className="overflow-hidden">
-      <CardHeader>
+      <CardHeader className="items-center">
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
           <img
             alt={title}
-            className={cn("h-40 w-full rounded-md object-cover", className)}
+            height="500"
+            className={cn(
+              size === "sm" ? "h-20" : "h-40",
+              "w-full rounded-md object-cover",
+              className
+            )}
             src={imageUrl}
           />
           <Input

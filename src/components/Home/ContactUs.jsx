@@ -17,75 +17,17 @@ import TextArea from "@/components/FormInputs/TextAreaInput";
 import PhoneInput from "@/components/FormInputs/PhoneInput";
 import FormSelectInput from "@/components/FormInputs/FormSelectInput";
 import { countries } from "@/lib/countryData";
+import { mediaSources, roles } from "@/lib/formOption";
+import { submitContactForm } from "@/utils/api";
+import { toast } from "@/hooks/use-toast";
 
 const ContactUs = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
-
-  const roles = [
-    {
-      label: "Principal",
-      value: "Principal",
-    },
-    {
-      label: "School Administrator",
-      value: "Administrator",
-    },
-    {
-      label: "Teacher",
-      value: "Teacher",
-    },
-    {
-      label: "Student",
-      value: "Student",
-    },
-    {
-      label: "IT Support",
-      value: "ITSupport",
-    },
-    {
-      label: "Receptionist",
-      value: "Receptionist",
-    },
-    {
-      label: "Counselor",
-      value: "Counselor",
-    },
-    {
-      label: "Head of Department",
-      value: "HOD",
-    },
-    {
-      label: "Non-Teaching Staff",
-      value: "NonTeachingStaff",
-    },
-    {
-      label: "Others",
-      value: "Others",
-    },
-  ];
-
-  const mediaSources = [
-    {
-      label: "Social Media",
-      value: "SocialMedia",
-    },
-    {
-      label: "Search Engine",
-      value: "SearchEngine",
-    },
-    {
-      label: "Word of Mouth",
-      value: "WordOfMouth",
-    },
-    {
-      label: "Others",
-      value: "Others",
-    },
-  ];
 
   const [isLoading, setIsLoading] = useState(false);
   const [phoneCode, setPhoneCode] = useState(false);
@@ -97,9 +39,37 @@ const ContactUs = () => {
   );
   const [selectedCountry, setSelectedCountry] = useState(initialCountry);
 
-  const onSubmit = (data) => {
-    console.log("Form submitted:", data);
-    // Handle form submission logic here
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const response = await submitContactForm(data);
+      console.log("Form submitted successfully:", response);
+      toast({
+        title: "Success",
+        description: "Your message has been sent successfully!",
+        variant: "success",
+      });
+      reset();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      if (error.message.includes("email has already been submitted")) {
+        toast({
+          title: "Error",
+          description:
+            "This email has already been submitted. Please use a different email address.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            "An error occurred while submitting the form. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

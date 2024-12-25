@@ -35,7 +35,11 @@ const PasswordInput = ({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-0">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-0 m-0 h-5 w-5 flex items-center justify-center"
+                  >
                     <CircleHelp className="w-4 h-4 text-muted-foreground" />
                   </Button>
                 </TooltipTrigger>
