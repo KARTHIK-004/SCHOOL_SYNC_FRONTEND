@@ -130,12 +130,12 @@ const navLinks = [
   },
   {
     title: "Staff Management",
-    url: "/staff",
+    url: "/dashboard/staff",
     icon: Users,
     items: [
       {
-        title: "Staff Directory",
-        url: "/staff/directory",
+        title: "Staffs",
+        url: "/dashboard/staffs",
       },
       {
         title: "Attendance",

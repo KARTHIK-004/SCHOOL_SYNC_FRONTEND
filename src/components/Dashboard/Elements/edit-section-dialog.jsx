@@ -22,7 +22,7 @@ export function EditSectionDialog({ section, onEdit, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onEdit(section.id, sectionName, teacherName);
+    onEdit(sectionName, teacherName);
     onClose();
   };
 
@@ -32,7 +32,8 @@ export function EditSectionDialog({ section, onEdit, onClose }) {
         <DialogHeader>
           <DialogTitle>Edit Section</DialogTitle>
           <DialogDescription>
-            Update the details of the section.
+            Update the details of the section. Section name must be 10
+            characters or less.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -46,6 +47,7 @@ export function EditSectionDialog({ section, onEdit, onClose }) {
                 value={sectionName}
                 onChange={(e) => setSectionName(e.target.value)}
                 className="col-span-3"
+                maxLength={10}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">

@@ -94,9 +94,7 @@ const Navbar = () => {
   const [error] = useState(null);
   const { toast } = useToast();
 
-  const [user, setUser] = React.useState(
-    JSON.parse(localStorage.getItem("user"))
-  );
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
 
   useEffect(() => {
     if (localStorage.getItem("token") && !user) {

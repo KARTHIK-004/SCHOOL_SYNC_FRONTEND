@@ -11,9 +11,11 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import CreateStudents from "./pages/dashboard/students/CreateStudents";
 import Parents from "./pages/dashboard/users/Parents";
 import CreateParents from "./pages/dashboard/users/CreateParents";
-import ClassManagement from "./pages/dashboard/academics/Classes";
 import SchoolOnboard from "./pages/SchoolOnboard";
 import Contacts from "./pages/dashboard/admin/Contacts";
+import ClassManagement from "./pages/dashboard/academics/ClassManagement";
+import Staffs from "./pages/dashboard/staffs/Staffs";
+import CreateStaffs from "./pages/dashboard/staffs/CreateStaffs";
 
 export default function App() {
   return (
@@ -34,6 +36,8 @@ export default function App() {
             <Route path="students/new" element={<CreateStudents />} />
             <Route path="users/parents" element={<Parents />} />
             <Route path="users/parents/new" element={<CreateParents />} />
+            <Route path="staffs" element={<Staffs />} />
+            <Route path="staffs/new" element={<CreateStaffs />} />
             <Route path="academics/classes" element={<ClassManagement />} />
           </Route>
         </Routes>

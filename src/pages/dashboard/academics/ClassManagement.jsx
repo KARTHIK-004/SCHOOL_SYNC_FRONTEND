@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
   GraduationCap,
-  Search,
   ChevronRight,
   Pencil,
   Trash2,
   Users,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,16 @@ import { EditClassDialog } from "@/components/Dashboard/Elements/edit-class-dial
 import { EditSectionDialog } from "@/components/Dashboard/Elements/edit-section-dialog";
 import { DeleteDialog } from "@/components/Dashboard/Elements/delete-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  getClasses,
+  createClass,
+  updateClass,
+  deleteClass,
+  getSections,
+  createSection,
+  updateSection,
+  deleteSection,
+} from "@/utils/api";
 
 export default function ClassManagement() {
   const { toast } = useToast();
@@ -29,127 +38,235 @@ export default function ClassManagement() {
   const [editingClass, setEditingClass] = useState(null);
   const [editingSection, setEditingSection] = useState(null);
   const [deletingItem, setDeletingItem] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Simulating API call
-    setTimeout(() => {
-      setClasses([
-        { id: "1", name: "Class 5", sections: 3, students: 120 },
-        { id: "2", name: "Class 6", sections: 2, students: 80 },
-        { id: "3", name: "Class 7", sections: 4, students: 160 },
-        { id: "4", name: "Class 8", sections: 3, students: 115 },
-      ]);
-      setSections({
-        "Class 5": [
-          { id: "1", name: "5A", teacher: "Ms. Sarah", students: 40 },
-          { id: "2", name: "5B", teacher: "Mr. John", students: 38 },
-          { id: "3", name: "5C", teacher: "Ms. Emily", students: 42 },
-        ],
-        "Class 6": [
-          { id: "4", name: "6A", teacher: "Mr. Smith", students: 35 },
-          { id: "5", name: "6B", teacher: "Ms. Johnson", students: 45 },
-        ],
-        "Class 7": [
-          { id: "6", name: "7A", teacher: "Mr. Brown", students: 40 },
-          { id: "7", name: "7B", teacher: "Ms. Davis", students: 38 },
-          { id: "8", name: "7C", teacher: "Mr. Wilson", students: 42 },
-          { id: "9", name: "7D", teacher: "Ms. Taylor", students: 40 },
-        ],
-        "Class 8": [
-          { id: "10", name: "8A", teacher: "Mr. Anderson", students: 38 },
-          { id: "11", name: "8B", teacher: "Ms. Thomas", students: 40 },
-          { id: "12", name: "8C", teacher: "Mr. Jackson", students: 37 },
-        ],
-      });
-      setIsLoading(false);
-    }, 1500);
+    fetchClasses();
+    fetchSections();
   }, []);
 
-  const handleAddClass = (className) => {
-    const newClass = {
-      id: Date.now().toString(),
-      name: className,
-      sections: 0,
-      students: 0,
-    };
-    setClasses([...classes, newClass]);
-    setSections({ ...sections, [className]: [] });
-    toast({
-      title: "Class Added",
-      description: `${className} has been successfully added.`,
-    });
-  };
-
-  const handleEditClass = (id, newName) => {
-    const oldName = classes.find((c) => c.id === id).name;
-    setClasses(classes.map((c) => (c.id === id ? { ...c, name: newName } : c)));
-    setSections({ ...sections, [newName]: sections[oldName] });
-    delete sections[oldName];
-    if (selectedClass === oldName) setSelectedClass(newName);
-    toast({
-      title: "Class Updated",
-      description: `${oldName} has been renamed to ${newName}.`,
-    });
-  };
-
-  const handleDeleteClass = (id) => {
-    const className = classes.find((c) => c.id === id).name;
-    setClasses(classes.filter((c) => c.id !== id));
-    delete sections[className];
-    if (selectedClass === className) setSelectedClass(null);
-    toast({
-      title: "Class Deleted",
-      description: `${className} has been deleted.`,
-    });
-  };
-
-  const handleAddSection = (sectionName, teacherName) => {
-    if (selectedClass) {
-      const newSection = {
-        id: Date.now().toString(),
-        name: sectionName,
-        teacher: teacherName,
-        students: 0,
-      };
-      setSections({
-        ...sections,
-        [selectedClass]: [...sections[selectedClass], newSection],
-      });
-      setClasses(
-        classes.map((c) =>
-          c.name === selectedClass ? { ...c, sections: c.sections + 1 } : c
-        )
-      );
+  const fetchClasses = async () => {
+    try {
+      const response = await getClasses();
+      const fetchedClasses = Array.isArray(response)
+        ? response
+        : response?.data?.classes || response?.classes || [];
+      setClasses(fetchedClasses);
+    } catch (error) {
+      console.error("Failed to fetch classes", error);
       toast({
-        title: "Section Added",
-        description: `${sectionName} has been added to ${selectedClass}.`,
+        title: "Failed to load classes",
+        description: "Please try refreshing the page.",
+        variant: "destructive",
+      });
+      setClasses([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchSections = async () => {
+    try {
+      const response = await getSections();
+      const fetchedSections = response.data?.sections || [];
+
+      const sectionsByClass = fetchedSections.reduce(
+        (sectionGroups, section) => {
+          const className = section.class.name;
+          if (!sectionGroups[className]) {
+            sectionGroups[className] = [];
+          }
+          sectionGroups[className].push(section);
+          return sectionGroups;
+        },
+        {}
+      );
+
+      setSections(sectionsByClass);
+    } catch (error) {
+      console.error("Failed to fetch sections", error);
+      toast({
+        title: "Failed to load sections",
+        description: "Please try refreshing the page.",
+        variant: "destructive",
+      });
+      setSections({});
+    }
+  };
+
+  const handleAddClass = async (className) => {
+    try {
+      const newClass = await createClass(className);
+      if (newClass && newClass._id) {
+        setClasses((prevClasses) => [...prevClasses, newClass]);
+        toast({
+          title: "Class Added",
+          description: `${className} has been successfully added.`,
+        });
+      } else {
+        throw new Error("Invalid class data received");
+      }
+    } catch (error) {
+      console.error("Failed to add class", error);
+      toast({
+        title: "Failed to add class",
+        description:
+          error.message || "An error occurred while adding the class.",
+        variant: "destructive",
       });
     }
   };
 
-  const handleEditSection = (id, newName, newTeacher) => {
-    if (selectedClass) {
-      setSections({
-        ...sections,
-        [selectedClass]: sections[selectedClass].map((s) =>
-          s.id === id ? { ...s, name: newName, teacher: newTeacher } : s
-        ),
+  const handleEditClass = async (classId, newName) => {
+    try {
+      const updatedClass = await updateClass(classId, { name: newName });
+      setClasses(classes.map((c) => (c._id === classId ? updatedClass : c)));
+      const oldClass = classes.find((c) => c._id === classId);
+      if (oldClass) {
+        setSections((prevSections) => {
+          const updatedSections = { ...prevSections };
+          if (updatedSections[oldClass.name]) {
+            updatedSections[newName] = updatedSections[oldClass.name];
+            delete updatedSections[oldClass.name];
+          }
+          return updatedSections;
+        });
+        if (selectedClass === oldClass.name) {
+          setSelectedClass(newName);
+        }
+      }
+      toast({
+        title: "Class Updated",
+        description: `Class has been renamed to ${newName}.`,
       });
+    } catch (error) {
+      console.error("Failed to update class", error);
+      toast({
+        title: "Failed to update class",
+        description:
+          error.message || "An error occurred while updating the class.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteClass = async (id) => {
+    try {
+      await deleteClass(id);
+      const deletedClass = classes.find((classItem) => classItem._id === id);
+      setClasses((prevClasses) =>
+        prevClasses.filter((classItem) => classItem._id !== id)
+      );
+      setSections((prevSections) => {
+        const updatedSections = { ...prevSections };
+        delete updatedSections[deletedClass.name];
+        return updatedSections;
+      });
+      if (selectedClass === deletedClass.name) {
+        setSelectedClass(null);
+      }
+      toast({
+        title: "Class Deleted",
+        description: `${deletedClass.name} has been deleted.`,
+        variant: "destructive",
+      });
+    } catch (error) {
+      console.error("Failed to delete class", error);
+      toast({
+        title: "Failed to delete class",
+        description:
+          error.message || "An error occurred while deleting the class.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddSection = async (sectionName, teacherName) => {
+    if (selectedClass) {
+      try {
+        const classObj = classes.find(
+          (classItem) => classItem.name === selectedClass
+        );
+        const sectionData = {
+          name: sectionName,
+          class: classObj._id,
+          teacher: teacherName,
+        };
+        const newSection = await createSection(sectionData);
+        setSections((prevSections) => ({
+          ...prevSections,
+          [selectedClass]: [...(prevSections[selectedClass] || []), newSection],
+        }));
+        setClasses((prevClasses) =>
+          prevClasses.map((classItem) =>
+            classItem.name === selectedClass
+              ? { ...classItem, sections: (classItem.sections || 0) + 1 }
+              : classItem
+          )
+        );
+        toast({
+          title: "Section Added Successfully",
+          description: `${sectionName} has been successfully added to the ${selectedClass} class.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Failed to add section",
+          description:
+            error.response?.data?.message ||
+            error.message ||
+            "An error occurred while adding the section.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "Error",
+        description: "Please select a class before adding a section.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditSection = async (id, newName, newTeacher) => {
+    try {
+      await updateSection(id, {
+        name: newName,
+        teacher: newTeacher,
+      });
+      setSections((prevSections) => ({
+        ...prevSections,
+        [selectedClass]: prevSections[selectedClass].map((s) =>
+          s._id === id ? { ...s, name: newName, teacher: newTeacher } : s
+        ),
+      }));
       toast({
         title: "Section Updated",
-        description: `Section has been updated.`,
+        description: `Section has been updated to ${newName}.`,
+      });
+    } catch (error) {
+      console.error("Failed to update section", error);
+      toast({
+        title: "Failed to update section",
+        description:
+          error.response?.data?.message ||
+          error.message ||
+          "An error occurred while updating the section.",
+        variant: "destructive",
       });
     }
   };
 
-  const handleDeleteSection = (id) => {
-    if (selectedClass) {
-      setSections({
-        ...sections,
-        [selectedClass]: sections[selectedClass].filter((s) => s.id !== id),
-      });
-      setClasses(
-        classes.map((c) =>
+  const handleDeleteSection = async (id) => {
+    try {
+      await deleteSection(id);
+      setSections((prevSections) => ({
+        ...prevSections,
+        [selectedClass]: prevSections[selectedClass].filter(
+          (s) => s._id !== id
+        ),
+      }));
+      setClasses((prevClasses) =>
+        prevClasses.map((c) =>
           c.name === selectedClass ? { ...c, sections: c.sections - 1 } : c
         )
       );
@@ -157,21 +274,47 @@ export default function ClassManagement() {
         title: "Section Deleted",
         description: `Section has been deleted from ${selectedClass}.`,
       });
+    } catch (error) {
+      console.error("Failed to delete section", error);
+      toast({
+        title: "Failed to delete section",
+        description:
+          error.message || "An error occurred while deleting the section.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleClassClick = (className) => {
     setSelectedClass(className);
+    setIsMobileMenuOpen(false);
   };
 
-  const filteredClasses = classes.filter((c) =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredClasses = Array.isArray(classes)
+    ? classes.filter((c) =>
+        c.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-background">
+    <div className="flex flex-col md:flex-row h-full bg-background">
+      {/* Mobile Menu Toggle */}
+      <div className="md:hidden p-4 bg-card border-b">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? "Hide Classes" : "Show Classes"}
+        </Button>
+      </div>
+
       {/* Sidebar */}
-      <div className="w-full md:w-80 p-4 border-r bg-card">
+      <div
+        className={`w-full md:w-80 p-4 border-r bg-card ${
+          isMobileMenuOpen ? "block" : "hidden md:block"
+        }`}
+      >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <GraduationCap className="h-6 w-6" />
@@ -180,17 +323,18 @@ export default function ClassManagement() {
           <AddClassDialog onAddClass={handleAddClass} />
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 relative">
           <Input
             type="search"
             placeholder="Search classes..."
-            className="w-full"
+            className="w-full pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         </div>
 
-        <ScrollArea className="space-y-2">
+        <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
           {isLoading ? (
             Array(4)
               .fill()
@@ -203,7 +347,7 @@ export default function ClassManagement() {
           ) : filteredClasses.length > 0 ? (
             filteredClasses.map((classItem) => (
               <div
-                key={classItem.id}
+                key={classItem._id}
                 className={`p-3 rounded-lg hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center justify-between group ${
                   selectedClass === classItem.name
                     ? "bg-accent text-accent-foreground"
@@ -243,7 +387,7 @@ export default function ClassManagement() {
                       e.stopPropagation();
                       setDeletingItem({
                         type: "class",
-                        id: classItem.id,
+                        id: classItem._id,
                         name: classItem.name,
                       });
                     }}
@@ -258,14 +402,14 @@ export default function ClassManagement() {
               No classes found
             </div>
           )}
-        </ScrollArea>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-4 overflow-auto">
+      <div className="flex-1 p-4 overflow-y-auto">
         {selectedClass ? (
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
               <div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                   <span>Classes</span>
@@ -292,7 +436,7 @@ export default function ClassManagement() {
                   ))
               ) : sections[selectedClass]?.length > 0 ? (
                 sections[selectedClass].map((section) => (
-                  <Card key={section.id}>
+                  <Card key={section._id}>
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-semibold">
@@ -314,7 +458,7 @@ export default function ClassManagement() {
                             onClick={() =>
                               setDeletingItem({
                                 type: "section",
-                                id: section.id,
+                                id: section._id,
                                 name: section.name,
                               })
                             }
@@ -360,7 +504,9 @@ export default function ClassManagement() {
       {editingSection && (
         <EditSectionDialog
           section={editingSection}
-          onEdit={handleEditSection}
+          onEdit={(newName, newTeacher) =>
+            handleEditSection(editingSection._id, newName, newTeacher)
+          }
           onClose={() => setEditingSection(null)}
         />
       )}
@@ -370,8 +516,8 @@ export default function ClassManagement() {
           item={deletingItem}
           onDelete={
             deletingItem.type === "class"
-              ? handleDeleteClass
-              : handleDeleteSection
+              ? () => handleDeleteClass(deletingItem.id)
+              : () => handleDeleteSection(deletingItem.id)
           }
           onClose={() => setDeletingItem(null)}
         />

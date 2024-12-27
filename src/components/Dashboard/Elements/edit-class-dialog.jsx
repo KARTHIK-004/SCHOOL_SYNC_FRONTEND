@@ -12,16 +12,34 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function EditClassDialog({ classItem, onEdit, onClose }) {
-  const [className, setClassName] = useState(classItem.name);
+  const [className, setClassName] = useState(classItem?.name || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    setClassName(classItem.name);
+    setClassName(classItem?.name || "");
   }, [classItem]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onEdit(classItem.id, className);
-    onClose();
+
+    if (!classItem?._id) {
+      console.error("No class ID available");
+      return;
+    }
+
+    if (!className.trim()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await onEdit(classItem._id, className.trim());
+      onClose();
+    } catch (error) {
+      console.error("Failed to edit class:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -42,11 +60,26 @@ export function EditClassDialog({ classItem, onEdit, onClose }) {
                 value={className}
                 onChange={(e) => setClassName(e.target.value)}
                 className="col-span-3"
+                placeholder="Enter class name"
+                disabled={isSubmitting}
+                required
+                minLength={1}
+                maxLength={50}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Save Changes</Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!className.trim() || isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
