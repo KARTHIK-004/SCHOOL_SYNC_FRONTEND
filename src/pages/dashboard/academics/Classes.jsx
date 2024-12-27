@@ -17,6 +17,7 @@ import { EditClassDialog } from "@/components/Dashboard/Elements/edit-class-dial
 import { EditSectionDialog } from "@/components/Dashboard/Elements/edit-section-dialog";
 import { DeleteDialog } from "@/components/Dashboard/Elements/delete-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ClassManagement() {
   const { toast } = useToast();
@@ -189,7 +190,7 @@ export default function ClassManagement() {
           />
         </div>
 
-        <div className="space-y-2">
+        <ScrollArea className="space-y-2">
           {isLoading ? (
             Array(4)
               .fill()
@@ -257,7 +258,7 @@ export default function ClassManagement() {
               No classes found
             </div>
           )}
-        </div>
+        </ScrollArea>
       </div>
 
       {/* Main Content */}

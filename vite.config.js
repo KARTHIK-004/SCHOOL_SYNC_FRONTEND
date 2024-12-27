@@ -23,4 +23,7 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: ["react-day-picker"],
+  },
 });

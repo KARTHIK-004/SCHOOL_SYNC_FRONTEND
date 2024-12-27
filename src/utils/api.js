@@ -74,25 +74,13 @@ export const getCurrentUser = async () => {
   }
 };
 
-// export const createSchool = async (formData) => {
-//   try {
-//     const response = await api.post(`/schools/create`, formData);
-//     return response.data;
-//   } catch (error) {
-//     throw error.response ? error.response.data : error.message;
-//   }
-// };
-
 export const createSchool = async (formData) => {
-  const response = await fetch("/api/schools/create", {
-    method: "POST",
-    body: formData,
-  });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to create school");
+  try {
+    const response = await api.post(`/schools/create`, formData);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
   }
-  return response.json();
 };
 
 export const getSchools = async () => {

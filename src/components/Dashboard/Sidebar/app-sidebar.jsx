@@ -20,6 +20,7 @@ import {
   Command,
   DollarSign,
   GraduationCap,
+  Key,
   LayoutDashboard,
   LineChart,
   MessageSquare,
@@ -48,6 +49,17 @@ const navLinks = [
       {
         title: "Overview",
         url: "/dashboard",
+      },
+    ],
+  },
+  {
+    title: "Admin Only",
+    url: "/dashboard/admin",
+    icon: Key,
+    items: [
+      {
+        title: "Contact",
+        url: "/dashboard/admin/contacts",
       },
     ],
   },

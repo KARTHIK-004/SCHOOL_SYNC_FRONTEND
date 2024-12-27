@@ -13,6 +13,7 @@ import Parents from "./pages/dashboard/users/Parents";
 import CreateParents from "./pages/dashboard/users/CreateParents";
 import ClassManagement from "./pages/dashboard/academics/Classes";
 import SchoolOnboard from "./pages/SchoolOnboard";
+import Contacts from "./pages/dashboard/admin/Contacts";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
+            <Route path="admin/contacts" element={<Contacts />} />
             <Route path="students" element={<Students />} />
             <Route path="students/new" element={<CreateStudents />} />
             <Route path="users/parents" element={<Parents />} />

@@ -5,14 +5,15 @@ import TextInput from "@/components/FormInputs/TextInput";
 import SubmitButton from "@/components/FormInputs/SubmitButton";
 import { Send } from "lucide-react";
 import { createSchool } from "@/utils/api";
-import { toast } from "@/hooks/use-toast";
 import ImageInput from "@/components/FormInputs/ImageInput";
+import { toast } from "@/hooks/use-toast";
 
 export default function SchoolOnboardForm() {
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -22,14 +23,17 @@ export default function SchoolOnboardForm() {
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [imageUrl, setImageUrl] = useState("/School_Sync.png");
 
-  async function onSubmit(data) {
-    console.log(data);
+  async function saveSchool(data) {
+    setLoading(true);
     try {
-      const response = await createSchool(onSubmit);
-      console.log("Form submitted successfully:", response);
+      const schoolData = {
+        schoolname: data.schoolname,
+        logo: imageUrl,
+      };
+
+      const response = await createSchool(schoolData);
       toast({
         title: "Success",
         description: "School registered successfully!",
@@ -37,13 +41,11 @@ export default function SchoolOnboardForm() {
       });
       // navigate("/dashboard");
     } catch (error) {
-      console.error("Error submitting form:", error);
-      if (error.message.includes("School with this name already exists")) {
-        toast({
-          title: "Error",
-          description:
-            "This School Name has already been submitted. Please use a different School Name address.",
-          variant: "destructive",
+      if (error.message === "A school with this name already exists") {
+        setError("schoolname", {
+          type: "manual",
+          message:
+            "This school name is already taken. Please choose a different name.",
         });
       } else {
         toast({
@@ -59,7 +61,7 @@ export default function SchoolOnboardForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(saveSchool)}>
       <div className="text-center">
         <h1 className="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl">
           Welcome to School Sync
@@ -74,23 +76,23 @@ export default function SchoolOnboardForm() {
           <div className="grid gap-6">
             <div className="grid gap-4">
               <TextInput
-                label="School Name"
                 register={register}
-                name="schoolname"
                 errors={errors}
-                placeholder="School Sync"
+                label="School Name"
+                name="schoolname"
+                required
               />
             </div>
 
             <div>
-              {/* <ImageInput
+              <ImageInput
                 title="Customise your School Logo"
                 imageUrl={imageUrl}
                 setImageUrl={setImageUrl}
                 endpoint="schoolLogo"
                 className="object-contain"
                 size="sm"
-              /> */}
+              />
             </div>
           </div>
         </div>
