@@ -309,7 +309,7 @@ export default function ClassManagement() {
         </Button>
       </div>
 
-      {/* Sidebar */}
+      {/* Class Content */}
       <div
         className={`w-full md:w-80 p-4 border-r bg-card ${
           isMobileMenuOpen ? "block" : "hidden md:block"
@@ -405,7 +405,7 @@ export default function ClassManagement() {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Section Content */}
       <div className="flex-1 p-4 overflow-y-auto">
         {selectedClass ? (
           <div className="max-w-7xl mx-auto">

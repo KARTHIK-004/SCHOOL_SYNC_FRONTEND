@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import FormHeader from "../FormHeader";
 import FormFooter from "../FormFooter";
 import TextArea from "@/components/FormInputs/TextAreaInput";
@@ -11,14 +12,15 @@ import PasswordInput from "@/components/FormInputs/PasswordInput";
 import PhoneInput from "@/components/FormInputs/PhoneInput";
 import { Lock } from "lucide-react";
 import { countries } from "@/lib/countryData";
+import { genders, bloodGroups, religions } from "@/lib/formOption";
 import {
-  parents,
-  genders,
-  bloodGroups,
-  religions,
-  classes,
-  streams,
-} from "@/lib/formOption";
+  getParents,
+  getClasses,
+  getSectionsByClassId,
+  getSections,
+  createStudent,
+  updateStudentProfile,
+} from "@/utils/api";
 
 export default function SingleStudent({ editingId, initialData }) {
   const {
@@ -43,57 +45,214 @@ export default function SingleStudent({ editingId, initialData }) {
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [parents, setParents] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [sections, setSections] = useState([]);
 
-  // Initialize select states
-  const initialCountryCode = "IN";
-  const initialCountry = countries.find(
-    (item) => item.countryCode === initialCountryCode
-  );
-
-  const [selectedNationality, setSelectedNationality] = useState(
-    initialData?.nationality
+  const [formData, setFormData] = useState({
+    nationality: initialData?.nationality
       ? countries.find((c) => c.value === initialData.nationality)
-      : initialCountry
+      : countries.find((item) => item.countryCode === "IN"),
+    parent: initialData?.parent
+      ? {
+          value: initialData.parent.id,
+          label: initialData.parent.name,
+        }
+      : null,
+    gender: initialData?.gender
+      ? {
+          value: initialData.gender,
+          label: genders.find((g) => g.value === initialData.gender)?.label,
+        }
+      : null,
+    religion: initialData?.religion
+      ? {
+          value: initialData.religion,
+          label: religions.find((r) => r.value === initialData.religion)?.label,
+        }
+      : null,
+    bloodGroup: initialData?.bloodGroup
+      ? {
+          value: initialData.bloodGroup,
+          label: bloodGroups.find((b) => b.value === initialData.bloodGroup)
+            ?.label,
+        }
+      : null,
+    class: initialData?.class
+      ? {
+          value: initialData.class._id,
+          label: initialData.class.name,
+        }
+      : null,
+    section: initialData?.section
+      ? {
+          value: initialData.section._id,
+          label: initialData.section.name,
+        }
+      : null,
+  });
+
+  const [phoneCode, setPhoneCode] = useState(initialData?.phoneCode || false);
+  const [imageUrl, setImageUrl] = useState(
+    initialData?.imageUrl || "/student.png"
   );
 
-  const [selectedParent, setSelectedParent] = useState(null);
-  const [selectedGender, setSelectedGender] = useState(null);
-  const [selectedReligion, setSelectedReligion] = useState(null);
-  const [selectedBloodGroup, setSelectedBloodGroup] = useState(null);
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [selectedStream, setSelectedStream] = useState(null);
-  const [phoneCode, setPhoneCode] = useState(false);
-  const [imageUrl, setImageUrl] = useState("/student.png");
+  const updateFormData = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  useEffect(() => {
+    async function fetchParents() {
+      try {
+        const response = await getParents();
+        const parents = response.data?.parents;
+        if (Array.isArray(parents)) {
+          const formattedParents = parents.map((parent) => ({
+            label: `${parent.firstname} ${parent.lastname}`,
+            value: parent._id,
+          }));
+          setParents(formattedParents);
+        } else {
+          console.error("Unexpected API response format:", response);
+          setParents([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch parents:", error);
+        toast.error("Failed to load parents");
+        setParents([]);
+      }
+    }
+
+    fetchParents();
+  }, []);
+
+  useEffect(() => {
+    async function fetchClasses() {
+      try {
+        const response = await getClasses();
+        if (Array.isArray(response)) {
+          const formattedClasses = response.map((cls) => ({
+            label: cls.name,
+            value: cls._id,
+          }));
+          setClasses(formattedClasses);
+        } else {
+          console.error("Unexpected API response format:", response);
+          setClasses([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch classes:", error);
+        toast.error("Failed to load classes");
+        setClasses([]);
+      }
+    }
+
+    fetchClasses();
+  }, []);
+
+  useEffect(() => {
+    async function fetchInitialSections() {
+      try {
+        const response = await getSections();
+        if (Array.isArray(response.data.sections)) {
+          const formattedSections = response.data.sections.map((section) => ({
+            label: section.name,
+            value: section._id,
+          }));
+          setSections(formattedSections);
+        } else {
+          console.error("Unexpected API response format:", response);
+          setSections([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch initial sections:", error);
+        toast.error("Failed to load sections");
+        setSections([]);
+      }
+    }
+
+    fetchInitialSections();
+  }, []);
+
+  const fetchSectionsByClass = async (classId) => {
+    try {
+      const response = await getSectionsByClassId(classId);
+      if (Array.isArray(response.data.sections)) {
+        const formattedSections = response.data.sections.map((section) => ({
+          label: section.name,
+          value: section._id,
+        }));
+        setSections(formattedSections);
+      } else {
+        console.error("Unexpected API response format:", response);
+        setSections([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch sections for class:", error);
+      toast.error("Failed to load sections for selected class");
+      setSections([]);
+    }
+  };
+
+  const handleClassChange = (selectedClass) => {
+    updateFormData("class", selectedClass);
+    updateFormData("section", null);
+    if (selectedClass) {
+      fetchSectionsByClass(selectedClass.value);
+    } else {
+      setSections([]);
+    }
+  };
 
   async function saveStudent(data) {
     try {
       setLoading(true);
-      const formData = {
+      const studentData = {
         ...data,
         imageUrl,
-        nationality: selectedNationality?.value,
-        gender: selectedGender?.value,
-        religion: selectedReligion?.value,
-        bloodGroup: selectedBloodGroup?.value,
-        class: selectedClass?.value,
-        stream: selectedStream?.value,
         phoneCode,
+        nationality: formData.nationality?.value,
+        gender: formData.gender?.value,
+        religion: formData.religion?.value,
+        bloodGroup: formData.bloodGroup?.value,
+        // Format class data like parent
+        class: formData.class
+          ? {
+              id: formData.class.value,
+              name: formData.class.label,
+            }
+          : null,
+        // Format section data like parent
+        section: formData.section
+          ? {
+              id: formData.section.value,
+              name: formData.section.label,
+            }
+          : null,
+        // Keep parent structure the same
+        parent: formData.parent
+          ? {
+              id: formData.parent.value,
+              name: formData.parent.label,
+            }
+          : null,
       };
-
       if (editingId) {
-        // await updateStudent(editingId, formData);
-        // toast.success("Updated Successfully!");
+        await updateStudentProfile(editingId, studentData);
+        toast.success("Student updated successfully!");
       } else {
-        // await createStudent(formData);
-        // toast.success("Successfully Created!");
+        await createStudent(studentData);
+        toast.success("Student created successfully!");
       }
 
-      reset();
+      // reset();
       setImageUrl("/student.png");
-      console.log(data);
       // navigate("/students");
     } catch (error) {
-      console.error(error);
+      console.error("Error saving student:", error);
+      toast.error(
+        error?.message || "An error occurred while saving the student"
+      );
     } finally {
       setLoading(false);
     }
@@ -117,14 +276,14 @@ export default function SingleStudent({ editingId, initialData }) {
                 register={register}
                 errors={errors}
                 label="First Name"
-                name="name"
+                name="firstname"
                 required
               />
               <TextInput
                 register={register}
                 errors={errors}
-                label="Middle Name"
-                name="middlename"
+                label="Last Name"
+                name="lastname"
                 required
               />
             </div>
@@ -144,8 +303,8 @@ export default function SingleStudent({ editingId, initialData }) {
                 register={register}
                 errors={errors}
                 options={genders}
-                option={selectedGender}
-                setOption={setSelectedGender}
+                option={formData.gender}
+                setOption={(value) => updateFormData("gender", value)}
                 isSearchable={false}
                 required
               />
@@ -155,8 +314,8 @@ export default function SingleStudent({ editingId, initialData }) {
                 register={register}
                 errors={errors}
                 options={bloodGroups}
-                option={selectedBloodGroup}
-                setOption={setSelectedBloodGroup}
+                option={formData.bloodGroup}
+                setOption={(value) => updateFormData("bloodGroup", value)}
                 required
               />
             </div>
@@ -193,13 +352,17 @@ export default function SingleStudent({ editingId, initialData }) {
                 required
               />
               <FormSelectInput
-                label="Parent Name "
+                label="Parent Name"
                 name="parent"
                 register={register}
                 errors={errors}
-                options={parents}
-                option={selectedParent}
-                setOption={setSelectedParent}
+                options={
+                  parents.length > 0
+                    ? parents
+                    : [{ label: "No parents found", value: "" }]
+                }
+                option={formData.parent}
+                setOption={(value) => updateFormData("parent", value)}
                 toolTipText="Add New Parent/Guardian"
                 href="/dashboard/users/parents/new"
                 required
@@ -210,8 +373,8 @@ export default function SingleStudent({ editingId, initialData }) {
                 register={register}
                 errors={errors}
                 options={religions}
-                option={selectedReligion}
-                setOption={setSelectedReligion}
+                option={formData.religion}
+                setOption={(value) => updateFormData("religion", value)}
                 required
               />
             </div>
@@ -222,24 +385,33 @@ export default function SingleStudent({ editingId, initialData }) {
                 name="class"
                 register={register}
                 errors={errors}
-                options={classes}
-                option={selectedClass}
-                setOption={setSelectedClass}
+                options={
+                  classes.length > 0
+                    ? classes
+                    : [{ label: "No classes found", value: "" }]
+                }
+                option={formData.class}
+                setOption={handleClassChange}
                 toolTipText="Add New Class"
-                href="/dashboard/academics/classes/new"
+                href="/dashboard/academics/classes"
                 required
               />
               <FormSelectInput
-                label="Stream"
-                name="stream"
+                label="Section"
+                name="section"
                 register={register}
                 errors={errors}
-                options={streams}
-                option={selectedStream}
-                setOption={setSelectedStream}
+                options={
+                  sections.length > 0
+                    ? sections
+                    : [{ label: "No sections found", value: "" }]
+                }
+                option={formData.section}
+                setOption={(value) => updateFormData("section", value)}
                 toolTipText="Add New Stream"
-                href="/dashboard/academics/streams/new"
+                href="/dashboard/academics/classes"
                 required
+                isDisabled={!formData.class}
               />
             </div>
 
@@ -249,6 +421,7 @@ export default function SingleStudent({ editingId, initialData }) {
                 errors={errors}
                 label="Admission Date"
                 name="admissiondate"
+                type="date"
                 required
               />
               <TextInput
@@ -275,8 +448,8 @@ export default function SingleStudent({ editingId, initialData }) {
                   register={register}
                   errors={errors}
                   options={countries}
-                  option={selectedNationality}
-                  setOption={setSelectedNationality}
+                  option={formData.nationality}
+                  setOption={(value) => updateFormData("nationality", value)}
                   required
                 />
                 <TextInput

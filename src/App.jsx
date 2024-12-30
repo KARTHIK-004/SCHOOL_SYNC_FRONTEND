@@ -13,9 +13,11 @@ import Parents from "./pages/dashboard/users/Parents";
 import CreateParents from "./pages/dashboard/users/CreateParents";
 import SchoolOnboard from "./pages/SchoolOnboard";
 import Contacts from "./pages/dashboard/admin/Contacts";
-import ClassManagement from "./pages/dashboard/academics/ClassManagement";
 import Staffs from "./pages/dashboard/staffs/Staffs";
 import CreateStaffs from "./pages/dashboard/staffs/CreateStaffs";
+
+import { Sections } from "./pages/dashboard/academics/Sections";
+import { Classes } from "./pages/dashboard/academics/Classes";
 
 export default function App() {
   return (
@@ -36,9 +38,23 @@ export default function App() {
             <Route path="students/new" element={<CreateStudents />} />
             <Route path="users/parents" element={<Parents />} />
             <Route path="users/parents/new" element={<CreateParents />} />
+            <Route path="users/parents/edit/:id" element={<CreateParents />} />
             <Route path="staffs" element={<Staffs />} />
             <Route path="staffs/new" element={<CreateStaffs />} />
-            <Route path="academics/classes" element={<ClassManagement />} />
+            <Route path="academics/classes" element={<Classes />}>
+              <Route
+                index
+                element={
+                  <div className="flex items-center justify-center h-full text-muted-foreground">
+                    Select a class to view its sections
+                  </div>
+                }
+              />
+              <Route path=":classId" element={<Sections />} />
+            </Route>
+
+            {/* Add a separate route for sections */}
+            <Route path="sections/:classId" element={<Sections />} />
           </Route>
         </Routes>
       </BrowserRouter>

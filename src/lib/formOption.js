@@ -43,7 +43,7 @@ export const classes = [
   { label: "Class 3", value: "class3" },
 ];
 
-export const streams = [
+export const sections = [
   { label: "Science", value: "science" },
   { label: "Commerce", value: "commerce" },
   { label: "Arts", value: "arts" },

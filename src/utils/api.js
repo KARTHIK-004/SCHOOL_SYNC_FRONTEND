@@ -165,6 +165,19 @@ export const createSection = async (sectionData) => {
   }
 };
 
+export const getSectionsByClassId = async (classId) => {
+  try {
+    const response = await api.get(`/sections/class/${classId}`);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      console.warn(`No sections found for class ID: ${classId}`);
+      return { data: { sections: [] } };
+    }
+    console.error("Error fetching sections by class ID:", error);
+    throw error;
+  }
+};
 export const getSections = async () => {
   try {
     const response = await api.get("/sections");
@@ -201,42 +214,76 @@ export const deleteSection = async (id) => {
   }
 };
 
-export const fetchClasses = async () => {
-  // Simulating API call delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-
-  return [
-    { id: "1", name: "Class 5", sections: 3, students: 120 },
-    { id: "2", name: "Class 6", sections: 2, students: 80 },
-    { id: "3", name: "Class 7", sections: 4, students: 160 },
-    { id: "4", name: "Class 8", sections: 3, students: 115 },
-  ];
+// Parents API calls
+export const createParent = async (parentData) => {
+  try {
+    const response = await api.post("/parents", parentData);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
 };
 
-export const fetchSections = async () => {
-  // Simulating API call delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+export const getParents = async () => {
+  try {
+    const response = await api.get(`/parents`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
 
-  return {
-    "Class 5": [
-      { id: "1", name: "5A", teacher: "Ms. Sarah", students: 40 },
-      { id: "2", name: "5B", teacher: "Mr. John", students: 38 },
-      { id: "3", name: "5C", teacher: "Ms. Emily", students: 42 },
-    ],
-    "Class 6": [
-      { id: "4", name: "6A", teacher: "Mr. Smith", students: 35 },
-      { id: "5", name: "6B", teacher: "Ms. Johnson", students: 45 },
-    ],
-    "Class 7": [
-      { id: "6", name: "7A", teacher: "Mr. Brown", students: 40 },
-      { id: "7", name: "7B", teacher: "Ms. Davis", students: 38 },
-      { id: "8", name: "7C", teacher: "Mr. Wilson", students: 42 },
-      { id: "9", name: "7D", teacher: "Ms. Taylor", students: 40 },
-    ],
-    "Class 8": [
-      { id: "10", name: "8A", teacher: "Mr. Anderson", students: 38 },
-      { id: "11", name: "8B", teacher: "Ms. Thomas", students: 40 },
-      { id: "12", name: "8C", teacher: "Mr. Jackson", students: 37 },
-    ],
-  };
+export const updateParent = async (id, parentData) => {
+  try {
+    const response = await api.put(`/parents/${id}`, parentData);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getParent = async (id) => {
+  try {
+    const response = await api.get(`/parents/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+// Student API calls
+export const createStudent = async (studentData) => {
+  try {
+    const response = await api.post("/students/", studentData);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getStudentProfile = async () => {
+  try {
+    const response = await api.get("/students/me");
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const updateStudentProfile = async (id, data) => {
+  try {
+    const response = await api.put(`/students/${id}`, data);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getAllStudents = async () => {
+  try {
+    const response = await api.get("/students");
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
 };

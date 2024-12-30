@@ -18,6 +18,8 @@ import {
   titles,
   contactMethods,
 } from "@/lib/formOption";
+import { createParent, updateParent } from "@/utils/api";
+import { toast } from "@/hooks/use-toast";
 
 export default function ParentRegistration({ editingId, initialData }) {
   const {
@@ -76,24 +78,43 @@ export default function ParentRegistration({ editingId, initialData }) {
         relationship: selectedRelationship?.value,
         occupation: selectedOccupation?.value,
         preferredContact: selectedPreferredContact?.value,
-        phoneCode,
-        whatsappCode,
       };
 
       if (editingId) {
-        // await updateParent(editingId, formData);
-        // toast.success("Updated Successfully!");
+        await updateParent(editingId, formData);
+        toast({
+          title: "Success",
+          description: "Parent information updated successfully",
+        });
       } else {
-        // await createParent(formData);
-        // toast.success("Successfully Created!");
+        await createParent(formData);
+        toast({
+          title: "Success",
+          description: "Parent registered successfully",
+        });
       }
-
       reset();
       setImageUrl("/parent.png");
-      console.log(data);
-      // navigate("/parents");
     } catch (error) {
       console.error(error);
+      if (
+        error.status === "error" &&
+        error.message ===
+          "This email is already registered. Please use a different email address."
+      ) {
+        toast({
+          title: "Registration Failed",
+          description:
+            "This email is already registered. Please use a different email address.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
