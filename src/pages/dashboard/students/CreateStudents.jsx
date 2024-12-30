@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   UserPlus,
@@ -26,8 +26,43 @@ import {
 import SingleStudent from "@/components/Dashboard/Forms/Students/single-student-form";
 import BulkStudent from "@/components/Dashboard/Forms/Students/bulk-student-form";
 import InfoBanner from "@/components/ui/info-banner";
+import { createStudent, updateStudentProfile } from "@/utils/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CreateStudents() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async (studentData) => {
+    try {
+      if (id) {
+        // Editing existing student
+        await updateStudentProfile(id, studentData);
+        toast({
+          title: "Success",
+          description: "Student updated successfully",
+        });
+      } else {
+        // Creating new student
+        await createStudent(studentData);
+        toast({
+          title: "Success",
+          description: "Student created successfully",
+        });
+      }
+      // navigate('/students');
+    } catch (error) {
+      console.error("Error saving student:", error);
+      toast({
+        title: "Error",
+        description:
+          error.message || "An error occurred while saving the student",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -73,7 +108,7 @@ export default function CreateStudents() {
           <Card className="mt-4 border">
             <CardContent className="p-6">
               <TabsContent value="single">
-                <SingleStudent />
+                <SingleStudent editingId={id} onSubmit={handleSubmit} />
               </TabsContent>
               <TabsContent value="bulk">
                 <BulkStudent />

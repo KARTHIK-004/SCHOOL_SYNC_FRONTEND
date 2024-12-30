@@ -22,6 +22,9 @@ export const signIn = async (email, password) => {
     const response = await api.post(`/users/signin`, { email, password });
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
+      if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
     }
     return response.data;
   } catch (error) {
@@ -39,6 +42,9 @@ export const signUp = async (name, email, password, userType) => {
     });
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
+      if (response.data.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
     }
     return response.data;
   } catch (error) {
@@ -50,6 +56,7 @@ export const logout = async () => {
   try {
     const response = await api.post(`/users/logout`);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
@@ -254,34 +261,43 @@ export const getParent = async (id) => {
 // Student API calls
 export const createStudent = async (studentData) => {
   try {
-    const response = await api.post("/students/", studentData);
+    const response = await api.post("/students", studentData);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
   }
 };
 
-export const getStudentProfile = async () => {
+export const updateStudent = async (id, studentData) => {
   try {
-    const response = await api.get("/students/me");
+    const response = await api.put(`/students/${id}`, studentData);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
   }
 };
 
-export const updateStudentProfile = async (id, data) => {
+export const updateStudentProfile = async (id, studentData) => {
   try {
-    const response = await api.put(`/students/${id}`, data);
+    const response = await api.put(`/students/${id}`, studentData);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
   }
 };
 
-export const getAllStudents = async () => {
+export const getStudents = async () => {
   try {
     const response = await api.get("/students");
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getStudentById = async (id) => {
+  try {
+    const response = await api.get(`/students/${id}`);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;

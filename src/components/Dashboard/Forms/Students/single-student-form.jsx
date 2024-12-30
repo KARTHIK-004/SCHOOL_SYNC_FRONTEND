@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { Lock } from "lucide-react";
 import FormHeader from "../FormHeader";
 import FormFooter from "../FormFooter";
 import TextArea from "@/components/FormInputs/TextAreaInput";
@@ -10,7 +11,6 @@ import ImageInput from "@/components/FormInputs/ImageInput";
 import FormSelectInput from "@/components/FormInputs/FormSelectInput";
 import PasswordInput from "@/components/FormInputs/PasswordInput";
 import PhoneInput from "@/components/FormInputs/PhoneInput";
-import { Lock } from "lucide-react";
 import { countries } from "@/lib/countryData";
 import { genders, bloodGroups, religions } from "@/lib/formOption";
 import {
@@ -20,191 +20,163 @@ import {
   getSections,
   createStudent,
   updateStudentProfile,
+  getStudentById,
 } from "@/utils/api";
 
-export default function SingleStudent({ editingId, initialData }) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      firstname: initialData?.firstname || "",
-      lastname: initialData?.lastname || "",
-      email: initialData?.email || "",
-      phone: initialData?.phone || "",
-      address: initialData?.address || "",
-      state: initialData?.state || "",
-      dob: initialData?.dob || "",
-      admissiondate: initialData?.admissiondate || "",
-      birthcertificateno: initialData?.birthcertificateno || "",
-      regno: initialData?.regno || "",
-    },
-  });
+// Utility function to format dates
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toISOString().split("T")[0];
+};
 
+export default function SingleStudent({ editingId }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [parents, setParents] = useState([]);
   const [classes, setClasses] = useState([]);
   const [sections, setSections] = useState([]);
+  const [initialData, setInitialData] = useState(null);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
   const [formData, setFormData] = useState({
-    nationality: initialData?.nationality
-      ? countries.find((c) => c.value === initialData.nationality)
-      : countries.find((item) => item.countryCode === "IN"),
-    parent: initialData?.parent
-      ? {
-          value: initialData.parent.id,
-          label: initialData.parent.name,
-        }
-      : null,
-    gender: initialData?.gender
-      ? {
-          value: initialData.gender,
-          label: genders.find((g) => g.value === initialData.gender)?.label,
-        }
-      : null,
-    religion: initialData?.religion
-      ? {
-          value: initialData.religion,
-          label: religions.find((r) => r.value === initialData.religion)?.label,
-        }
-      : null,
-    bloodGroup: initialData?.bloodGroup
-      ? {
-          value: initialData.bloodGroup,
-          label: bloodGroups.find((b) => b.value === initialData.bloodGroup)
-            ?.label,
-        }
-      : null,
-    class: initialData?.class
-      ? {
-          value: initialData.class._id,
-          label: initialData.class.name,
-        }
-      : null,
-    section: initialData?.section
-      ? {
-          value: initialData.section._id,
-          label: initialData.section.name,
-        }
-      : null,
+    nationality: countries.find((item) => item.countryCode === "IN"),
+    parent: null,
+    gender: null,
+    religion: null,
+    bloodGroup: null,
+    class: null,
+    section: null,
   });
 
-  const [phoneCode, setPhoneCode] = useState(initialData?.phoneCode || false);
-  const [imageUrl, setImageUrl] = useState(
-    initialData?.imageUrl || "/student.png"
-  );
+  const [phoneCode, setPhoneCode] = useState("+91");
+  const [imageUrl, setImageUrl] = useState("/student.png");
 
   const updateFormData = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   useEffect(() => {
-    async function fetchParents() {
+    async function fetchInitialData() {
       try {
-        const response = await getParents();
-        const parents = response.data?.parents;
-        if (Array.isArray(parents)) {
-          const formattedParents = parents.map((parent) => ({
+        const [parentsResponse, classesData, sectionsData] = await Promise.all([
+          getParents(),
+          getClasses(),
+          getSections(),
+        ]);
+        const parentsData = parentsResponse.data?.parents || [];
+
+        setParents(
+          (parentsData.length > 0 ? parentsData : []).map((parent) => ({
             label: `${parent.firstname} ${parent.lastname}`,
             value: parent._id,
-          }));
-          setParents(formattedParents);
-        } else {
-          console.error("Unexpected API response format:", response);
-          setParents([]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch parents:", error);
-        toast.error("Failed to load parents");
-        setParents([]);
-      }
-    }
-
-    fetchParents();
-  }, []);
-
-  useEffect(() => {
-    async function fetchClasses() {
-      try {
-        const response = await getClasses();
-        if (Array.isArray(response)) {
-          const formattedClasses = response.map((cls) => ({
+          }))
+        );
+        setClasses(
+          (classesData.length > 0 ? classesData : []).map((cls) => ({
             label: cls.name,
             value: cls._id,
-          }));
-          setClasses(formattedClasses);
-        } else {
-          console.error("Unexpected API response format:", response);
-          setClasses([]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch classes:", error);
-        toast.error("Failed to load classes");
-        setClasses([]);
-      }
-    }
-
-    fetchClasses();
-  }, []);
-
-  useEffect(() => {
-    async function fetchInitialSections() {
-      try {
-        const response = await getSections();
-        if (Array.isArray(response.data.sections)) {
-          const formattedSections = response.data.sections.map((section) => ({
+          }))
+        );
+        setSections(
+          (sectionsData.length > 0 ? sectionsData : []).map((section) => ({
             label: section.name,
             value: section._id,
-          }));
-          setSections(formattedSections);
-        } else {
-          console.error("Unexpected API response format:", response);
-          setSections([]);
+          }))
+        );
+
+        if (editingId) {
+          const studentData = await getStudentById(editingId);
+          const formattedData = {
+            ...studentData,
+            dob: formatDate(studentData.dob),
+            admissiondate: formatDate(studentData.admissiondate),
+          };
+
+          setInitialData(formattedData);
+          reset(formattedData);
+          setFormData({
+            nationality: countries.find(
+              (c) => c.value === studentData.nationality
+            ),
+            parent: studentData.parent
+              ? { value: studentData.parent.id, label: studentData.parent.name }
+              : null,
+            gender: studentData.gender
+              ? {
+                  value: studentData.gender,
+                  label: genders.find((g) => g.value === studentData.gender)
+                    ?.label,
+                }
+              : null,
+            religion: studentData.religion
+              ? {
+                  value: studentData.religion,
+                  label: religions.find((r) => r.value === studentData.religion)
+                    ?.label,
+                }
+              : null,
+            bloodGroup: studentData.bloodGroup
+              ? {
+                  value: studentData.bloodGroup,
+                  label: bloodGroups.find(
+                    (b) => b.value === studentData.bloodGroup
+                  )?.label,
+                }
+              : null,
+            class: studentData.class
+              ? { value: studentData.class.id, label: studentData.class.name }
+              : null,
+            section: studentData.section
+              ? {
+                  value: studentData.section.id,
+                  label: studentData.section.name,
+                }
+              : null,
+          });
+          setPhoneCode(studentData.phoneCode || "+91");
+          setImageUrl(studentData.imageUrl || "/student.png");
         }
       } catch (error) {
-        console.error("Failed to fetch initial sections:", error);
-        toast.error("Failed to load sections");
-        setSections([]);
+        console.error("Error fetching initial data:", error);
+        toast.error("Failed to load initial data");
       }
     }
 
-    fetchInitialSections();
-  }, []);
+    fetchInitialData();
+  }, [editingId, reset]);
 
-  const fetchSectionsByClass = async (classId) => {
-    try {
-      const response = await getSectionsByClassId(classId);
-      if (Array.isArray(response.data.sections)) {
-        const formattedSections = response.data.sections.map((section) => ({
-          label: section.name,
-          value: section._id,
-        }));
-        setSections(formattedSections);
-      } else {
-        console.error("Unexpected API response format:", response);
-        setSections([]);
-      }
-    } catch (error) {
-      console.error("Failed to fetch sections for class:", error);
-      toast.error("Failed to load sections for selected class");
-      setSections([]);
-    }
-  };
-
-  const handleClassChange = (selectedClass) => {
+  const handleClassChange = async (selectedClass) => {
     updateFormData("class", selectedClass);
     updateFormData("section", null);
     if (selectedClass) {
-      fetchSectionsByClass(selectedClass.value);
+      try {
+        const response = await getSectionsByClassId(selectedClass.value);
+        const sectionsData = response.data?.sections || [];
+        setSections(
+          sectionsData.map((section) => ({
+            label: section.name,
+            value: section._id,
+          }))
+        );
+      } catch (error) {
+        console.error("Failed to fetch sections for class:", error);
+        toast.error("Failed to load sections for selected class");
+        setSections([]);
+      }
     } else {
       setSections([]);
     }
   };
 
-  async function saveStudent(data) {
+  async function onSubmit(data) {
     try {
       setLoading(true);
       const studentData = {
@@ -215,21 +187,18 @@ export default function SingleStudent({ editingId, initialData }) {
         gender: formData.gender?.value,
         religion: formData.religion?.value,
         bloodGroup: formData.bloodGroup?.value,
-        // Format class data like parent
         class: formData.class
           ? {
               id: formData.class.value,
               name: formData.class.label,
             }
           : null,
-        // Format section data like parent
         section: formData.section
           ? {
               id: formData.section.value,
               name: formData.section.label,
             }
           : null,
-        // Keep parent structure the same
         parent: formData.parent
           ? {
               id: formData.parent.value,
@@ -237,6 +206,7 @@ export default function SingleStudent({ editingId, initialData }) {
             }
           : null,
       };
+
       if (editingId) {
         await updateStudentProfile(editingId, studentData);
         toast.success("Student updated successfully!");
@@ -245,13 +215,11 @@ export default function SingleStudent({ editingId, initialData }) {
         toast.success("Student created successfully!");
       }
 
-      // reset();
-      setImageUrl("/student.png");
-      // navigate("/students");
+      navigate("/students");
     } catch (error) {
       console.error("Error saving student:", error);
       toast.error(
-        error?.message || "An error occurred while saving the student"
+        error.message || "An error occurred while saving the student"
       );
     } finally {
       setLoading(false);
@@ -259,7 +227,7 @@ export default function SingleStudent({ editingId, initialData }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(saveStudent)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <FormHeader
         href="/students"
         parent=""
@@ -356,11 +324,7 @@ export default function SingleStudent({ editingId, initialData }) {
                 name="parent"
                 register={register}
                 errors={errors}
-                options={
-                  parents.length > 0
-                    ? parents
-                    : [{ label: "No parents found", value: "" }]
-                }
+                options={parents}
                 option={formData.parent}
                 setOption={(value) => updateFormData("parent", value)}
                 toolTipText="Add New Parent/Guardian"
@@ -385,11 +349,7 @@ export default function SingleStudent({ editingId, initialData }) {
                 name="class"
                 register={register}
                 errors={errors}
-                options={
-                  classes.length > 0
-                    ? classes
-                    : [{ label: "No classes found", value: "" }]
-                }
+                options={classes}
                 option={formData.class}
                 setOption={handleClassChange}
                 toolTipText="Add New Class"
@@ -401,11 +361,7 @@ export default function SingleStudent({ editingId, initialData }) {
                 name="section"
                 register={register}
                 errors={errors}
-                options={
-                  sections.length > 0
-                    ? sections
-                    : [{ label: "No sections found", value: "" }]
-                }
+                options={sections}
                 option={formData.section}
                 setOption={(value) => updateFormData("section", value)}
                 toolTipText="Add New Stream"

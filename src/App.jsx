@@ -18,6 +18,7 @@ import CreateStaffs from "./pages/dashboard/staffs/CreateStaffs";
 
 import { Sections } from "./pages/dashboard/academics/Sections";
 import { Classes } from "./pages/dashboard/academics/Classes";
+import StudentDetails from "./pages/dashboard/students/StudentDetail";
 
 export default function App() {
   return (
@@ -36,9 +37,13 @@ export default function App() {
             <Route path="admin/contacts" element={<Contacts />} />
             <Route path="students" element={<Students />} />
             <Route path="students/new" element={<CreateStudents />} />
+            <Route path="students/:id" element={<StudentDetails />} />
+            <Route path="students/edit/:id" element={<CreateStudents />} />
             <Route path="users/parents" element={<Parents />} />
             <Route path="users/parents/new" element={<CreateParents />} />
+
             <Route path="users/parents/edit/:id" element={<CreateParents />} />
+
             <Route path="staffs" element={<Staffs />} />
             <Route path="staffs/new" element={<CreateStaffs />} />
             <Route path="academics/classes" element={<Classes />}>
