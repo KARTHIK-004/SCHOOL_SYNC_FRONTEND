@@ -64,7 +64,7 @@ export default function ParentRegistration({ editingId, initialData }) {
     useState(null);
   const [phoneCode, setPhoneCode] = useState(false);
   const [whatsappCode, setWhatsappCode] = useState(false);
-  const [imageUrl, setImageUrl] = useState("/student.png");
+  const [imageUrl, setImageUrl] = useState("/parent.png");
 
   async function saveParent(data) {
     try {
@@ -93,8 +93,9 @@ export default function ParentRegistration({ editingId, initialData }) {
           description: "Parent registered successfully",
         });
       }
-      reset();
+      // reset();
       setImageUrl("/parent.png");
+      // navigate("/parents");
     } catch (error) {
       console.error(error);
       if (

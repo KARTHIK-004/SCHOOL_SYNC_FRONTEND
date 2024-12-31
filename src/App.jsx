@@ -15,10 +15,9 @@ import SchoolOnboard from "./pages/SchoolOnboard";
 import Contacts from "./pages/dashboard/admin/Contacts";
 import Staffs from "./pages/dashboard/staffs/Staffs";
 import CreateStaffs from "./pages/dashboard/staffs/CreateStaffs";
-
-import { Sections } from "./pages/dashboard/academics/Sections";
 import { Classes } from "./pages/dashboard/academics/Classes";
 import StudentDetails from "./pages/dashboard/students/StudentDetail";
+import Sections from "./pages/dashboard/academics/Sections";
 
 export default function App() {
   return (
@@ -41,7 +40,6 @@ export default function App() {
             <Route path="students/edit/:id" element={<CreateStudents />} />
             <Route path="users/parents" element={<Parents />} />
             <Route path="users/parents/new" element={<CreateParents />} />
-
             <Route path="users/parents/edit/:id" element={<CreateParents />} />
 
             <Route path="staffs" element={<Staffs />} />
@@ -58,7 +56,6 @@ export default function App() {
               <Route path=":classId" element={<Sections />} />
             </Route>
 
-            {/* Add a separate route for sections */}
             <Route path="sections/:classId" element={<Sections />} />
           </Route>
         </Routes>

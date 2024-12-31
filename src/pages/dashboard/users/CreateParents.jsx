@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,8 +10,40 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ParentRegistration from "@/components/Dashboard/Forms/Users/parent-registration";
+import { createParent, updateParent } from "@/utils/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CreateParents() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async (parentData) => {
+    try {
+      if (id) {
+        await updateParent(id, parentData);
+        toast({
+          title: "Success",
+          description: "Parent updated successfully",
+        });
+      } else {
+        await createParent(parentData);
+        toast({
+          title: "Success",
+          description: "Parent created successfully",
+        });
+      }
+      // navigate('/parents');
+    } catch (error) {
+      console.error("Error saving parent:", error);
+      toast({
+        title: "Error",
+        description:
+          error.message || "An error occurred while saving the parent",
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -34,7 +66,7 @@ export default function CreateParents() {
       <div className="container mx-auto max-w-6xl">
         <Card className="mt-4 border">
           <CardContent className="p-6">
-            <ParentRegistration />
+            <ParentRegistration editingId={id} onSubmit={handleSubmit} />
           </CardContent>
         </Card>
       </div>

@@ -1,54 +1,50 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getStudentById } from "@/utils/api";
+import { getParentById } from "@/utils/api/parents";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Pencil } from "lucide-react";
 
-const StudentDetails = () => {
+const ParentDetails = () => {
   const { id } = useParams();
-  const [student, setStudent] = useState(null);
+  const [parent, setParent] = useState(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchStudent = async () => {
+    const fetchParent = async () => {
       try {
-        const data = await getStudentById(id);
-        setStudent(data);
+        const data = await getParentById(id);
+        setParent(data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching student:", error);
+        console.error("Error fetching parent:", error);
         toast({
           title: "Error",
-          description: "Failed to load student details",
+          description: "Failed to load parent details",
           variant: "destructive",
         });
         setLoading(false);
       }
     };
 
-    fetchStudent();
+    fetchParent();
   }, [id, toast]);
 
-  const studentDetails = student
+  const parentDetails = parent
     ? [
-        { label: "Name", value: `${student.firstname} ${student.lastname}` },
-        { label: "Email", value: student.email },
-        { label: "Phone", value: student.phone },
-        {
-          label: "Date of Birth",
-          value: new Date(student.dob).toLocaleDateString(),
-        },
-        { label: "Gender", value: student.gender },
-        { label: "Address", value: student.address },
-        { label: "Class", value: student.class ? student.class.name : "N/A" },
-        {
-          label: "Section",
-          value: student.section ? student.section.name : "N/A",
-        },
+        { label: "Name", value: `${parent.firstname} ${parent.lastname}` },
+        { label: "Email", value: parent.email },
+        { label: "Phone", value: parent.phone },
+        { label: "WhatsApp", value: parent.whatsapp || "N/A" },
+        { label: "Occupation", value: parent.occupation },
+        { label: "Nationality", value: parent.nationality },
+        { label: "Address", value: parent.address },
+        { label: "State", value: parent.state },
+        { label: "Relationship", value: parent.relationship },
+        { label: "Preferred Contact", value: parent.preferredContact },
       ]
     : [];
 
@@ -56,22 +52,22 @@ const StudentDetails = () => {
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Student Details</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Parent Details</h1>
           <p className="text-muted-foreground mt-2">
-            View and manage student information
+            View and manage parent information
           </p>
         </div>
         <Button variant="outline" asChild className="w-full sm:w-auto">
-          <Link to="/dashboard/students">
+          <Link to="/dashboard/parents">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Students
+            Back to Parents
           </Link>
         </Button>
       </div>
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Student Information</CardTitle>
+          <CardTitle>Parent Information</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -83,14 +79,14 @@ const StudentDetails = () => {
                 </div>
               ))}
             </div>
-          ) : !student ? (
+          ) : !parent ? (
             <div className="text-center py-8">
-              <p className="text-xl font-semibold">Student not found</p>
+              <p className="text-xl font-semibold">Parent not found</p>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {studentDetails.map((detail, index) => (
+                {parentDetails.map((detail, index) => (
                   <div key={index} className="space-y-1">
                     <h3 className="font-semibold text-sm ">{detail.label}</h3>
                     <p className="text-lg">{detail.value}</p>
@@ -99,9 +95,9 @@ const StudentDetails = () => {
               </div>
               <div className="mt-8 flex justify-end">
                 <Button asChild>
-                  <Link to={`/dashboard/students/edit/${student._id}`}>
+                  <Link to={`/dashboard/parents/edit/${parent._id}`}>
                     <Pencil className="mr-2 h-4 w-4" />
-                    Edit Student
+                    Edit Parent
                   </Link>
                 </Button>
               </div>
@@ -113,4 +109,4 @@ const StudentDetails = () => {
   );
 };
 
-export default StudentDetails;
+export default ParentDetails;

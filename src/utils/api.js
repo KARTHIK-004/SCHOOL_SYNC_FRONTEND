@@ -185,6 +185,17 @@ export const getSectionsByClassId = async (classId) => {
     throw error;
   }
 };
+
+export const getStudentsBySection = async (sectionId) => {
+  try {
+    const response = await api.get(`/students/section/${sectionId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching students by section:", error);
+    throw error;
+  }
+};
+
 export const getSections = async () => {
   try {
     const response = await api.get("/sections");
@@ -221,19 +232,10 @@ export const deleteSection = async (id) => {
   }
 };
 
-// Parents API calls
+// Parent API calls
 export const createParent = async (parentData) => {
   try {
     const response = await api.post("/parents", parentData);
-    return response.data;
-  } catch (error) {
-    throw error.response ? error.response.data : error.message;
-  }
-};
-
-export const getParents = async () => {
-  try {
-    const response = await api.get(`/parents`);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
@@ -249,9 +251,27 @@ export const updateParent = async (id, parentData) => {
   }
 };
 
-export const getParent = async (id) => {
+export const getParents = async () => {
+  try {
+    const response = await api.get("/parents");
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getParentById = async (id) => {
   try {
     const response = await api.get(`/parents/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const deleteParent = async (id) => {
+  try {
+    const response = await api.delete(`/parents/${id}`);
     return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
