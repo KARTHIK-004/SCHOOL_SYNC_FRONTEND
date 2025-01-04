@@ -15,9 +15,13 @@ import SchoolOnboard from "./pages/SchoolOnboard";
 import Contacts from "./pages/dashboard/admin/Contacts";
 import Staffs from "./pages/dashboard/staffs/Staffs";
 import CreateStaffs from "./pages/dashboard/staffs/CreateStaffs";
-import { Classes } from "./pages/dashboard/academics/Classes";
 import StudentDetails from "./pages/dashboard/students/StudentDetail";
-import Sections from "./pages/dashboard/academics/Sections";
+import Sections from "./pages/dashboard/academics/section/Sections";
+import Classes from "./pages/dashboard/academics/class/Classes";
+import SectionDetails from "./pages/dashboard/academics/section/SectionDetails";
+import CreateClasses from "./pages/dashboard/academics/class/CreateClasses";
+import CreateSections from "./pages/dashboard/academics/section/CreateSections";
+import { SelectClassPlaceholder } from "./pages/dashboard/academics/SelectClassPlaceholder";
 
 export default function App() {
   return (
@@ -41,22 +45,21 @@ export default function App() {
             <Route path="users/parents" element={<Parents />} />
             <Route path="users/parents/new" element={<CreateParents />} />
             <Route path="users/parents/edit/:id" element={<CreateParents />} />
-
             <Route path="staffs" element={<Staffs />} />
             <Route path="staffs/new" element={<CreateStaffs />} />
             <Route path="academics/classes" element={<Classes />}>
-              <Route
-                index
-                element={
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    Select a class to view its sections
-                  </div>
-                }
-              />
-              <Route path=":classId" element={<Sections />} />
-            </Route>
+              <Route index element={<SelectClassPlaceholder />} />
+              <Route path="new" element={<CreateClasses />} />
+              <Route path="edit/:id" element={<CreateClasses />} />
+              <Route path=":classId/section" element={<Sections />} />
+              <Route path="section/new" element={<CreateSections />} />
+              <Route path="section/edit/:id" element={<CreateSections />} />
 
-            <Route path="sections/:classId" element={<Sections />} />
+              <Route
+                path=":classId/sections/:sectionId"
+                element={<SectionDetails />}
+              />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

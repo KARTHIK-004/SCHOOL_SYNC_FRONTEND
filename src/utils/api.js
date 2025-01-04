@@ -117,10 +117,20 @@ export const getContactSubmissions = async () => {
 };
 
 // Class API calls
-export const createClass = async (className) => {
+// Class API calls
+export const createClass = async (classData) => {
   try {
-    const response = await api.post("/classes", { name: className });
-    return response.data.data.class;
+    const response = await api.post("/classes", classData);
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const updateClass = async (id, classData) => {
+  try {
+    const response = await api.put(`/classes/${id}`, classData);
+    return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
   }
@@ -128,35 +138,26 @@ export const createClass = async (className) => {
 
 export const getClasses = async () => {
   try {
-    const response = await api.get(`/classes`);
-    return response.data.data.classes;
+    const response = await api.get("/classes");
+    return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
   }
 };
 
-export const getClass = async (classId) => {
+export const getClassById = async (id) => {
   try {
-    const response = await api.get(`/classes/${classId}`);
-    return response.data.data.class;
+    const response = await api.get(`/classes/${id}`);
+    return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
   }
 };
 
-export const updateClass = async (classId, updatedData) => {
+export const deleteClass = async (id) => {
   try {
-    const response = await api.put(`/classes/${classId}`, updatedData);
-    return response.data.data.class;
-  } catch (error) {
-    throw error.response ? error.response.data : error.message;
-  }
-};
-
-export const deleteClass = async (classId) => {
-  try {
-    await api.delete(`/classes/${classId}`);
-    return true;
+    const response = await api.delete(`/classes/${id}`);
+    return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
   }
