@@ -52,9 +52,11 @@ export default function App() {
               <Route path="new" element={<CreateClasses />} />
               <Route path="edit/:id" element={<CreateClasses />} />
               <Route path=":classId/section" element={<Sections />} />
-              <Route path="section/new" element={<CreateSections />} />
-              <Route path="section/edit/:id" element={<CreateSections />} />
-
+              <Route path=":classId/section/new" element={<CreateSections />} />
+              <Route
+                path=":classId/section/:id/edit"
+                element={<CreateSections />}
+              />
               <Route
                 path=":classId/sections/:sectionId"
                 element={<SectionDetails />}

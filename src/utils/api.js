@@ -117,7 +117,6 @@ export const getContactSubmissions = async () => {
 };
 
 // Class API calls
-// Class API calls
 export const createClass = async (classData) => {
   try {
     const response = await api.post("/classes", classData);
@@ -166,9 +165,43 @@ export const deleteClass = async (id) => {
 // Section API calls
 export const createSection = async (sectionData) => {
   try {
+    console.log("Creating section with data:", sectionData);
     const response = await api.post("/sections", sectionData);
-    return response.data.data.section;
+    return response.data;
   } catch (error) {
+    console.error(
+      "Error creating section:",
+      error.response?.data || error.message
+    );
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const updateSection = async (id, sectionData) => {
+  try {
+    console.log("Updating section with data:", sectionData);
+    const { _id, ...dataToSend } = sectionData;
+    const response = await api.put(`/sections/${id}`, dataToSend);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating section:",
+      error.response?.data || error.message
+    );
+    console.error("Full error object:", error);
+    throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getSectionById = async (id) => {
+  try {
+    const response = await api.get(`/sections/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching section:",
+      error.response?.data || error.message
+    );
     throw error.response ? error.response.data : error.message;
   }
 };
@@ -178,22 +211,11 @@ export const getSectionsByClassId = async (classId) => {
     const response = await api.get(`/sections/class/${classId}`);
     return response.data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      console.warn(`No sections found for class ID: ${classId}`);
-      return { data: { sections: [] } };
-    }
-    console.error("Error fetching sections by class ID:", error);
-    throw error;
-  }
-};
-
-export const getStudentsBySection = async (sectionId) => {
-  try {
-    const response = await api.get(`/students/section/${sectionId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching students by section:", error);
-    throw error;
+    console.error(
+      "Error fetching sections by class ID:",
+      error.response?.data || error.message
+    );
+    throw error.response ? error.response.data : error.message;
   }
 };
 
@@ -206,30 +228,22 @@ export const getSections = async () => {
   }
 };
 
-export const getSection = async (sectionId) => {
-  try {
-    const response = await api.get(`/sections/${sectionId}`);
-    return response.data.data.section;
-  } catch (error) {
-    throw error.response ? error.response.data : error.message;
-  }
-};
-
-export const updateSection = async (id, sectionData) => {
-  try {
-    const response = await api.put(`/sections/${id}`, sectionData);
-    return response.data.data.section;
-  } catch (error) {
-    throw error.response ? error.response.data : error.message;
-  }
-};
-
 export const deleteSection = async (id) => {
   try {
-    await api.delete(`/sections/${id}`);
-    return true;
+    const response = await api.delete(`/sections/${id}`);
+    return response.data;
   } catch (error) {
     throw error.response ? error.response.data : error.message;
+  }
+};
+
+export const getStudentsBySection = async (sectionId) => {
+  try {
+    const response = await api.get(`/students/section/${sectionId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching students by section:", error);
+    throw error;
   }
 };
 

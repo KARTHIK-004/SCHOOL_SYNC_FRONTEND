@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { ArrowLeft, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,40 +9,83 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { createSection, updateSection } from "@/utils/api";
+import { createSection, updateSection, getSectionById } from "@/utils/api";
 import { useToast } from "@/hooks/use-toast";
 import { SectionForm } from "@/components/Dashboard/Forms/Academics/section-form";
 import InfoBanner from "@/components/ui/info-banner";
 
 export default function CreateSections() {
-  const { id } = useParams();
+  const { classId, id } = useParams();
+  const location = useLocation();
+  const className = location.state?.className;
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sectionData, setSectionData] = useState(null);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = async (sectionData) => {
-    try {
+  useEffect(() => {
+    const fetchSectionData = async () => {
       if (id) {
-        await updateSection(id, sectionData);
+        try {
+          const data = await getSectionById(id);
+          setSectionData(data);
+        } catch (error) {
+          console.error("Error fetching section data:", error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch section data",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    fetchSectionData();
+  }, [id, toast]);
+
+  const handleSubmit = async (formData) => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      console.log("Submitting section data:", formData);
+      const dataToSubmit = {
+        ...formData,
+        class: {
+          id: classId,
+          name: className,
+        },
+      };
+      if (id) {
+        await updateSection(id, dataToSubmit);
         toast({
           title: "Success",
           description: "Section updated successfully",
         });
       } else {
-        await createSection(sectionData);
+        await createSection(dataToSubmit);
         toast({
           title: "Success",
           description: "Section created successfully",
         });
       }
-      // navigate('/sections');
+      navigate(`/dashboard/academics/classes/${classId}/section`);
     } catch (error) {
       console.error("Error saving section:", error);
+      const errorMessage = error.errors
+        ? error.errors.join(", ")
+        : error.message;
+      setError(errorMessage);
       toast({
         title: "Error",
         description:
-          error.message || "An error occurred while saving the section",
+          errorMessage || "An error occurred while saving the section",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -51,26 +94,34 @@ export default function CreateSections() {
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Register Section
+            {id ? "Edit" : "Register"} Section for {className || "Class"}
           </h1>
           <p className="text-muted-foreground mt-2">
-            Create and manage academic sections
+            {id ? "Update" : "Create"} and manage academic sections for{" "}
+            {className || "this class"}
           </p>
         </div>
         <Button variant="outline" asChild>
-          <Link to="/dashboard/academics/classes">
+          <Link to={`/dashboard/academics/classes/${classId}/section`}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Sections
           </Link>
         </Button>
       </div>
 
-      <InfoBanner message="Please create the teacher first." type="warning" />
+      {error && <InfoBanner message={error} type="error" />}
 
       <div className="container mx-auto max-w-6xl">
         <Card className="mt-4 border">
           <CardContent className="p-6">
-            <SectionForm editingId={id} onSubmit={handleSubmit} />
+            <SectionForm
+              editingId={id}
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+              classId={classId}
+              className={className}
+              initialData={sectionData}
+            />
           </CardContent>
         </Card>
       </div>

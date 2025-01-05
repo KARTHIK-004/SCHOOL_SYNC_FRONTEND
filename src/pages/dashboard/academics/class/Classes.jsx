@@ -22,6 +22,7 @@ const ClassesList = ({
   onMobileClose,
   onDelete,
   onEdit,
+  onCreateSection,
 }) => {
   const filteredClasses = classes.filter((cls) =>
     cls.className.toLowerCase().includes(searchQuery.toLowerCase())
@@ -68,6 +69,17 @@ const ClassesList = ({
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onCreateSection(cls._id, cls.className);
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
               </div>
             </Link>
           </li>
@@ -109,7 +121,6 @@ const Classes = () => {
   }, [fetchClasses]);
 
   useEffect(() => {
-    // Refresh the class list when navigating back to this component
     if (location.pathname === "/dashboard/academics/classes") {
       fetchClasses();
     }
@@ -123,7 +134,7 @@ const Classes = () => {
           title: "Success",
           description: "Class deleted successfully",
         });
-        fetchClasses(); // Refresh the list after deletion
+        fetchClasses();
       } catch (error) {
         toast({
           title: "Error",
@@ -136,6 +147,12 @@ const Classes = () => {
 
   const handleEdit = (id) => {
     navigate(`/dashboard/academics/classes/${id}/edit`);
+  };
+
+  const handleCreateSection = (classId, className) => {
+    navigate(`/dashboard/academics/classes/${classId}/section/new`, {
+      state: { className },
+    });
   };
 
   const handleRefresh = () => {
@@ -194,6 +211,7 @@ const Classes = () => {
               onMobileClose={() => {}}
               onDelete={handleDelete}
               onEdit={handleEdit}
+              onCreateSection={handleCreateSection}
             />
           )}
         </div>

@@ -1,51 +1,78 @@
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import FormHeader from "../FormHeader";
 import FormFooter from "../FormFooter";
 import TextInput from "@/components/FormInputs/TextInput";
 import FormSelectInput from "@/components/FormInputs/FormSelectInput";
-import { createSection, updateSection } from "@/utils/api";
-import { toast } from "@/hooks/use-toast";
+import {
+  createSection,
+  updateSection,
+  getSectionById,
+  getClasses,
+} from "@/utils/api";
+import { useToast } from "@/hooks/use-toast";
 import { titles } from "@/lib/formOption";
 
-export function SectionForm({ editingId, initialData }) {
+export function SectionForm({
+  editingId,
+  onSubmit,
+  isSubmitting,
+  classId,
+  className,
+}) {
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
-  } = useForm({
-    defaultValues: {
-      sectionName: initialData?.sectionName || "",
-      sectionCode: initialData?.sectionCode || "",
-    },
-  });
+  } = useForm();
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   const [selectedTitle, setSelectedTitle] = useState(null);
 
+  useEffect(() => {
+    if (editingId) {
+      setLoading(true);
+      getSectionById(editingId)
+        .then((data) => {
+          reset(data);
+          setSelectedTitle(data.title);
+        })
+        .catch((error) => {
+          console.error("Error fetching section:", error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch section data",
+            variant: "destructive",
+          });
+        })
+        .finally(() => setLoading(false));
+    } else if (classId && className) {
+      setValue("class.id", classId);
+      setValue("class.name", className);
+    }
+  }, [editingId, reset, toast, classId, className, setValue]);
+
   async function saveSection(data) {
+    if (isSubmitting) return;
+
     try {
       setLoading(true);
-      if (editingId) {
-        await updateSection(editingId, data);
-        toast({
-          title: "Success",
-          description: "Section updated successfully",
-        });
-      } else {
-        await createSection(data);
-        toast({
-          title: "Success",
-          description: "Section created successfully",
-        });
-      }
-      reset();
-      navigate("/sections");
+      const sectionData = {
+        ...data,
+        class: {
+          id: classId,
+          name: className,
+        },
+      };
+      console.log("Submitting section data:", sectionData);
+      await onSubmit(sectionData);
     } catch (error) {
-      console.error(error);
+      console.error("Error in saveSection:", error);
       toast({
         title: "Error",
         description: "An error occurred. Please try again.",
@@ -59,11 +86,11 @@ export function SectionForm({ editingId, initialData }) {
   return (
     <form onSubmit={handleSubmit(saveSection)}>
       <FormHeader
-        href="/sections"
-        parent=""
+        href={`/dashboard/academics/classes/${classId}/section`}
+        parent="Academics"
         title="Sections"
         editingId={editingId}
-        loading={loading}
+        loading={loading || isSubmitting}
       />
       <div className="grid grid-cols-12 gap-6 py-8">
         <div className="lg:col-span-12 col-span-full space-y-3">
@@ -107,11 +134,11 @@ export function SectionForm({ editingId, initialData }) {
         </div>
       </div>
       <FormFooter
-        href="/sections"
+        href={`/dashboard/academics/classes/${classId}/section`}
         editingId={editingId}
-        loading={loading}
+        loading={loading || isSubmitting}
         title="Section"
-        parent=""
+        parent="Academics"
       />
     </form>
   );
