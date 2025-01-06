@@ -23,16 +23,17 @@ const Students = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const data = await getStudents();
-        setStudents(data);
-        setLoading(false);
+        setLoading(true);
+        const fetchedStudents = await getStudents();
+        setStudents(fetchedStudents);
       } catch (error) {
         console.error("Error fetching students:", error);
         toast({
           title: "Error",
-          description: "Failed to load students. Please try again later.",
+          description: "Failed to fetch students. Please try again.",
           variant: "destructive",
         });
+      } finally {
         setLoading(false);
       }
     };
@@ -45,7 +46,7 @@ const Students = () => {
       <Card>
         <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
           <CardTitle className="text-2xl font-bold">Students</CardTitle>
-          <Link href="/students/new" passHref>
+          <Link to="/dashboard/students/new">
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" /> Add New Student
             </Button>
@@ -84,10 +85,7 @@ const Students = () => {
                         {student.class ? student.class.name : "N/A"}
                       </TableCell>
                       <TableCell>
-                        <Link
-                          href={`/dashboard/students/${student._id}`}
-                          passHref
-                        >
+                        <Link to={`/dashboard/students/${student._id}`}>
                           <Button variant="outline" size="sm">
                             <Eye className="mr-2 h-4 w-4" /> View
                           </Button>

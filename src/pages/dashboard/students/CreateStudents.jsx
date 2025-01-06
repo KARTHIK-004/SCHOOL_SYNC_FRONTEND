@@ -1,3 +1,4 @@
+import React from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -37,21 +38,20 @@ export default function CreateStudents() {
   const handleSubmit = async (studentData) => {
     try {
       if (id) {
-        // Editing existing student
         await updateStudentProfile(id, studentData);
         toast({
           title: "Success",
           description: "Student updated successfully",
         });
       } else {
-        // Creating new student
-        await createStudent(studentData);
+        const newStudentData = { ...studentData };
+        await createStudent(newStudentData);
         toast({
           title: "Success",
           description: "Student created successfully",
         });
       }
-      // navigate('/students');
+      // navigate('/dashboard/students');
     } catch (error) {
       console.error("Error saving student:", error);
       toast({

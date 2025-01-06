@@ -45,6 +45,7 @@
     "react-hot-toast": "^2.4.1",
     "react-quill": "^2.0.0",
     "react-router-dom": "^7.0.2",
+    "react-select": "^5.9.0",
     "react-tailwindcss-select": "^1.8.5",
     "recharts": "^2.15.0",
     "tailwind-merge": "^2.5.5",

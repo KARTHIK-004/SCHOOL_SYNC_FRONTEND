@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
 import { Lock } from "lucide-react";
 import FormHeader from "../FormHeader";
 import FormFooter from "../FormFooter";
@@ -18,30 +17,30 @@ import {
   getClasses,
   getSectionsByClassId,
   getSections,
-  createStudent,
-  updateStudentProfile,
   getStudentById,
 } from "@/utils/api";
+import { useToast } from "@/hooks/use-toast";
 
-// Utility function to format dates
 const formatDate = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
   return date.toISOString().split("T")[0];
 };
 
-export default function SingleStudent({ editingId }) {
+export default function SingleStudent({ editingId, onSubmit }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [parents, setParents] = useState([]);
   const [classes, setClasses] = useState([]);
   const [sections, setSections] = useState([]);
   const [initialData, setInitialData] = useState(null);
+  const { toast } = useToast();
 
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     setValue,
     formState: { errors },
   } = useForm();
@@ -71,23 +70,25 @@ export default function SingleStudent({ editingId }) {
           getClasses(),
           getSections(),
         ]);
-        const parentsData = parentsResponse.data?.parents || [];
+        const parentsData = Array.isArray(parentsResponse)
+          ? parentsResponse
+          : parentsResponse.data || [];
 
-        setParents(
-          (parentsData.length > 0 ? parentsData : []).map((parent) => ({
-            label: `${parent.firstname} ${parent.lastname}`,
-            value: parent._id,
-          }))
-        );
+        const formattedParents = parentsData.map((parent) => ({
+          label: `${parent.firstname} ${parent.lastname}`,
+          value: parent._id,
+        }));
+
+        setParents(formattedParents);
         setClasses(
           (classesData.length > 0 ? classesData : []).map((cls) => ({
-            label: cls.name,
+            label: cls.className,
             value: cls._id,
           }))
         );
         setSections(
           (sectionsData.length > 0 ? sectionsData : []).map((section) => ({
-            label: section.name,
+            label: section.sectionName,
             value: section._id,
           }))
         );
@@ -146,7 +147,6 @@ export default function SingleStudent({ editingId }) {
         }
       } catch (error) {
         console.error("Error fetching initial data:", error);
-        toast.error("Failed to load initial data");
       }
     }
 
@@ -162,13 +162,12 @@ export default function SingleStudent({ editingId }) {
         const sectionsData = response.data?.sections || [];
         setSections(
           sectionsData.map((section) => ({
-            label: section.name,
+            label: section.sectionName,
             value: section._id,
           }))
         );
       } catch (error) {
         console.error("Failed to fetch sections for class:", error);
-        toast.error("Failed to load sections for selected class");
         setSections([]);
       }
     } else {
@@ -176,7 +175,7 @@ export default function SingleStudent({ editingId }) {
     }
   };
 
-  async function onSubmit(data) {
+  async function handleFormSubmit(data) {
     try {
       setLoading(true);
       const studentData = {
@@ -207,29 +206,39 @@ export default function SingleStudent({ editingId }) {
           : null,
       };
 
-      if (editingId) {
-        await updateStudentProfile(editingId, studentData);
-        toast.success("Student updated successfully!");
-      } else {
-        await createStudent(studentData);
-        toast.success("Student created successfully!");
-      }
-
-      navigate("/students");
+      await onSubmit(studentData);
+      // navigate("/dashboard/students");
     } catch (error) {
       console.error("Error saving student:", error);
-      toast.error(
-        error.message || "An error occurred while saving the student"
-      );
+      if (error.message === "Email address is already in use") {
+        setError("email", {
+          type: "manual",
+          message:
+            "This email is already in use. Please use a different email address.",
+        });
+        toast({
+          title: "Error",
+          description:
+            "This email is already in use. Please use a different email address.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description:
+            "An error occurred while saving the student. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
       <FormHeader
-        href="/students"
+        href="/dashboard/students"
         parent=""
         title="Students"
         editingId={editingId}
@@ -330,6 +339,7 @@ export default function SingleStudent({ editingId }) {
                 toolTipText="Add New Parent/Guardian"
                 href="/dashboard/users/parents/new"
                 required
+                placeholder="Select a parent"
               />
               <FormSelectInput
                 label="Religion"
@@ -439,7 +449,7 @@ export default function SingleStudent({ editingId }) {
       </div>
 
       <FormFooter
-        href="/students"
+        href="/dashboard/students"
         editingId={editingId}
         loading={loading}
         title="Student"
